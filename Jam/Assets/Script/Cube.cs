@@ -8,7 +8,7 @@ public class Cube : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        mat = GetComponent<Renderer>().material;
+       
     }
 
     // Update is called once per frame
@@ -17,7 +17,15 @@ public class Cube : MonoBehaviour
         
     }
 
-    public void setColor(Color32 c){
-        mat.color = c;
+    public void setColor(Color c){
+        if (mat == null)
+        {
+            mat = GetComponent<Renderer>().materials[0];
+            mat.color = c;
+        }
+        else
+        {
+            mat.color = c;
+        }
     }
 }

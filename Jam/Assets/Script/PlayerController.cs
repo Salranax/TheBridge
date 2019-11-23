@@ -38,16 +38,16 @@ public class PlayerController : MonoBehaviour
         if(!resetTurn){
             if(isSwiped){
                 if(dir == SwipeDirection.Left){
-                    gridType tmpType = GridSystem.instance.grid[gridX , gridY + 1];
-                    if(tmpType == gridType.floor || tmpType == gridType.slot){
+                    GridSystem.gridType tmpType = GridSystem.instance.grid[gridX , gridY + 1];
+                    if(tmpType == GridSystem.gridType.floor || tmpType == GridSystem.gridType.slot){
                         gridX -= 1;
                         StartCoroutine(Rotate90(Vector3.up, new Vector3(gridX, gridY, -0.5f)));
                     }
     
                 }
                 else if(dir == SwipeDirection.Right){
-                    gridType tmpType = GridSystem.instance.grid[gridX , gridY + 1];
-                    if(tmpType == gridType.floor || tmpType == gridType.slot){
+                    GridSystem.gridType tmpType = GridSystem.instance.grid[gridX , gridY + 1];
+                    if(tmpType == GridSystem.gridType.floor || tmpType == GridSystem.gridType.slot){
                         gridX += 1;
                         StartCoroutine(Rotate90(-Vector3.up, new Vector3(gridX, gridY, -0.5f)));
                     }
@@ -56,8 +56,8 @@ public class PlayerController : MonoBehaviour
                 isSwiped = false;
             }
             else{
-                gridType tmpType = GridSystem.instance.grid[gridX , gridY + 1];
-                if(tmpType == gridType.floor || tmpType == gridType.slot){
+                GridSystem.gridType tmpType = GridSystem.instance.grid[gridX , gridY + 1];
+                if(tmpType == GridSystem.gridType.floor || tmpType == GridSystem.gridType.slot){
                     gridY += 1;
                     StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
                 }
@@ -106,8 +106,8 @@ public class PlayerController : MonoBehaviour
         transform.rotation = startOrientation * Quaternion.AngleAxis(90, axis);
         transform.localPosition = finalPos;
 
-        gridType tmpType = GridSystem.instance.grid[gridX , gridY];
-        if(tmpType == gridType.slot){
+        GridSystem.gridType tmpType = GridSystem.instance.grid[gridX , gridY];
+        if(tmpType == GridSystem.gridType.slot){
             float time = 0;
 
             while(time < 0.1f){
@@ -120,11 +120,12 @@ public class PlayerController : MonoBehaviour
             GameObject tmp = Instantiate(GridSystem.instance.cubePrefab);
             tmp.transform.SetParent(GridSystem.instance.transform);
             tmp.transform.position = new Vector3(transform.position.x, transform.position.y, 0);
-
-            GridSystem.instance.grid[gridX , gridY] = gridType.floor;
-
+            
+            GridSystem.instance.grid[gridX , gridY] = GridSystem.gridType.floor;
+            GridSystem.instance.cubeGrid[gridX, gridY] = tmp.GetComponent<Cube>();
             resetTurn = true;
             //TODO: Complete bridge part
+            GridSystem.instance.whiten(gridY);
         }
     }
 

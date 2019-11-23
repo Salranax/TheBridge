@@ -20,7 +20,7 @@ public class EnemyPatrolScript : MonoBehaviour
     }
 
     public void moveEnemy(){
-        if(GridSystem.instance.grid[gridX + 1, gridY] == gridType.floor){
+        if(GridSystem.instance.grid[gridX + 1, gridY] == GridSystem.gridType.floor){
 
         }
         else{
