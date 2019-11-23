@@ -5,14 +5,17 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public static PlayerController instance;
+    
+    public int gridX, gridY;
+
+
+    Quaternion startOrientation;
+    SwipeDirection dir;
 
     private bool isSwiped = false;
     private bool resetTurn = false;
-    SwipeDirection dir;
-
     private int startX = 6, startY = 2;
-    public int gridX, gridY;
-    Quaternion startOrientation;
+    private Color startEmissionColor;
 
     void Awake() {
         if(instance == null){
@@ -26,6 +29,7 @@ public class PlayerController : MonoBehaviour
         gridY = 2;
         TickManager.instance.tick.AddListener(movePlayer);
         transform.localPosition = new Vector3(gridX, gridY, -0.5f);
+        startEmissionColor = GetComponent<Renderer>().material.GetColor("_EmissionColor");
     }
 
     // Update is called once per frame
@@ -60,6 +64,19 @@ public class PlayerController : MonoBehaviour
                 if(tmpType == GridSystem.gridType.floor || tmpType == GridSystem.gridType.slot){
                     gridY += 1;
                     StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
+                    if(LevelGenerator.instance.spotOrder == 0 || (LevelGenerator.instance.spotOrder < LevelGenerator.instance.spots.Length && gridY > LevelGenerator.instance.spots[LevelGenerator.instance.spotOrder - 1].y)){
+                        StartCoroutine("dimLight");
+                    }
+                    // else if(LevelGenerator.instance.spotOrder >= LevelGenerator.instance.spots.Length - 1){
+                    //     for (int i = 0; i < GridSystem.instance.cubeGrid.GetLength(0); i++)
+                    //     {
+                    //         Cube tmpCube = GridSystem.instance.cubeGrid[i,gridY];
+                    //         if(tmpCube != null){
+                    //             tmpCube.setColor(Color.white);
+                    //         }
+                    //     }
+                    // }
+                    
                 }
 
             }
@@ -68,6 +85,20 @@ public class PlayerController : MonoBehaviour
             resetPlayer();
         }
 
+    }
+
+    public IEnumerator dimLight(){
+        Material tmpMat = GetComponent<Renderer>().material;
+        float t = 0;
+        
+        Color currentColor = tmpMat.GetColor("_EmissionColor");
+        Color targetColor = new Color(currentColor.r * 0.3f, currentColor.g * 0.3f, currentColor.b * 0.3f, currentColor.a);
+
+        while(t < 0.2f){
+            tmpMat.SetColor("_EmissionColor", Color.Lerp(currentColor, targetColor, t * 5));
+            t += Time.deltaTime;
+            yield return new WaitForEndOfFrame();
+        }        
     }
 
     public void getSwipe(SwipeData dt){
@@ -90,6 +121,9 @@ public class PlayerController : MonoBehaviour
         gridX = startX;
         gridY = startY;
         resetTurn = false;
+        transform.rotation = Quaternion.identity;
+        GetComponent<Renderer>().material.SetColor("_EmissionColor", startEmissionColor);
+
     }
  
     private IEnumerator Rotate90(Vector3 axis, Vector3 finalPos) {
@@ -124,8 +158,21 @@ public class PlayerController : MonoBehaviour
             GridSystem.instance.grid[gridX , gridY] = GridSystem.gridType.floor;
             GridSystem.instance.cubeGrid[gridX, gridY] = tmp.GetComponent<Cube>();
             resetTurn = true;
-            //TODO: Complete bridge part
+            
+            LevelGenerator.instance.spotOrder ++;
             GridSystem.instance.whiten(gridY);
+        }
+        if(LevelGenerator.instance.spotOrder > LevelGenerator.instance.spots.Length - 1){
+            for (int i = 0; i < GridSystem.instance.cubeGrid.GetLength(0); i++)
+            {
+                Cube tmpCube = GridSystem.instance.cubeGrid[i,gridY];
+                if(tmpCube != null){
+                    tmpCube.setColor(Color.white);
+                }
+            }
+            if(gridY >= 22){
+                //TODO: game complete
+            }
         }
     }
 

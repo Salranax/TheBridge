@@ -67,7 +67,7 @@ public class GridSystem : MonoBehaviour
                         }
                         else if (j > 17 && cubeGrid[i, j] != null)
                         {
-                            cubeGrid[i, j].setColor(Color.black);
+                            cubeGrid[i, j].setColor(new Color32(0,0,0,1));
                         }
 
                     }
@@ -80,27 +80,23 @@ public class GridSystem : MonoBehaviour
         enemy1.transform.SetParent(this.transform);
         enemy1.transform.localPosition = new Vector3(5, 9, -0.5f);
         enemy1.GetComponent<EnemyPatrolScript>().enemy(5, 9);
-        grid[5, 9] = gridType.enemy;
     }
-
-
 
     public void whiten(int y)
     {
+        Debug.Log(y);
         for (int i = 0; i < grid.GetLength(0); i++)
         {
             for (int j = 0; j < grid.GetLength(1); j++)
             {
+                float a = 200 / (18 - y);
                 if (j <= y && (grid[i, j] != gridType.empty && grid[i, j] != gridType.slot) )
                 {
-                    Debug.Log(grid[i, j]);
-                    Debug.Log(i +" " +j);
                     cubeGrid[i, j].setColor(Color.white);
                 }
                 else if (j < 17 && j > y && (grid[i, j] != gridType.empty && grid[i, j] != gridType.slot) &&
                          grid[i, j] != gridType.enemy)
                 {
-                    float a = 255 / (18 - y);
                     cubeGrid[i, j].setColor(new Color((255 - a * j) / 255, (255 - a * j) / 255,
                         (255 - a * j) / 255, 1));
                 }

@@ -24,6 +24,10 @@ public class TickManager : MonoBehaviour
     }
 //
 
+    public void startGame(){
+        SetIsGameStarted(true);
+    }
+    
     void Awake()
     {
         if(instance == null){

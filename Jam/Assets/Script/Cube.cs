@@ -20,7 +20,7 @@ public class Cube : MonoBehaviour
     public void setColor(Color c){
         if (mat == null)
         {
-            mat = GetComponent<Renderer>().materials[0];
+            mat = GetComponent<Renderer>().material;
             mat.color = c;
         }
         else
