@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
     public static PlayerController instance;
 
     private bool isSwiped = false;
+    private bool resetTurn = false;
     SwipeDirection dir;
 
     private int startX = 6, startY = 2;
@@ -34,42 +35,39 @@ public class PlayerController : MonoBehaviour
     }
 
     public void movePlayer(){
-        if(isSwiped){
-            if(dir == SwipeDirection.Left){
-                gridType tmpType = GridSystem.instance.grid[gridX - 1, gridY];
-                if(tmpType == gridType.floor){
-                    gridX -= 1;
-                    //transform.localPosition = new Vector3(gridX, gridY, -0.5f);
-                    StartCoroutine(Rotate90(Vector3.up, new Vector3(gridX, gridY, -0.5f)));
+        if(!resetTurn){
+            if(isSwiped){
+                if(dir == SwipeDirection.Left){
+                    gridType tmpType = GridSystem.instance.grid[gridX , gridY + 1];
+                    if(tmpType == gridType.floor || tmpType == gridType.slot){
+                        gridX -= 1;
+                        StartCoroutine(Rotate90(Vector3.up, new Vector3(gridX, gridY, -0.5f)));
+                    }
+    
                 }
-                else if(tmpType == gridType.enemy){
-                    resetPlayer();
+                else if(dir == SwipeDirection.Right){
+                    gridType tmpType = GridSystem.instance.grid[gridX , gridY + 1];
+                    if(tmpType == gridType.floor || tmpType == gridType.slot){
+                        gridX += 1;
+                        StartCoroutine(Rotate90(-Vector3.up, new Vector3(gridX, gridY, -0.5f)));
+                    }
+
                 }
+                isSwiped = false;
             }
-            else if(dir == SwipeDirection.Right){
-                gridType tmpType = GridSystem.instance.grid[gridX + 1, gridY];
-                if(tmpType == gridType.floor){
-                    gridX += 1;
-                    //transform.localPosition = new Vector3(gridX, gridY, -0.5f);
-                    StartCoroutine(Rotate90(-Vector3.up, new Vector3(gridX, gridY, -0.5f)));
+            else{
+                gridType tmpType = GridSystem.instance.grid[gridX , gridY + 1];
+                if(tmpType == gridType.floor || tmpType == gridType.slot){
+                    gridY += 1;
+                    StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
                 }
-                else if(tmpType == gridType.enemy){
-                    resetPlayer();
-                }
+
             }
-            isSwiped = false;
         }
         else{
-            gridType tmpType = GridSystem.instance.grid[gridX + 1, gridY];
-            if(tmpType == gridType.floor){
-                gridY += 1;
-                //transform.localPosition = new Vector3(gridX, gridY, -0.5f);
-                StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
-            }
-            else if(tmpType == gridType.enemy){
-                resetPlayer();
-            }
+            resetPlayer();
         }
+
     }
 
     public void getSwipe(SwipeData dt){
@@ -91,6 +89,7 @@ public class PlayerController : MonoBehaviour
         transform.localPosition = new Vector3(startX, startY, -0.5f);
         gridX = startX;
         gridY = startY;
+        resetTurn = false;
     }
  
     private IEnumerator Rotate90(Vector3 axis, Vector3 finalPos) {
@@ -106,6 +105,27 @@ public class PlayerController : MonoBehaviour
         }
         transform.rotation = startOrientation * Quaternion.AngleAxis(90, axis);
         transform.localPosition = finalPos;
+
+        gridType tmpType = GridSystem.instance.grid[gridX , gridY];
+        if(tmpType == gridType.slot){
+            float time = 0;
+
+            while(time < 0.1f){
+                transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(transform.localPosition.x, transform.localPosition.y, 0.3f), time * 10);
+                time += Time.deltaTime;
+                yield return new WaitForEndOfFrame();
+            }
+
+            transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(transform.localPosition.x, transform.localPosition.y, 0.3f), time * 10);
+            GameObject tmp = Instantiate(GridSystem.instance.cubePrefab);
+            tmp.transform.SetParent(GridSystem.instance.transform);
+            tmp.transform.position = new Vector3(transform.position.x, transform.position.y, 0);
+
+            GridSystem.instance.grid[gridX , gridY] = gridType.floor;
+
+            resetTurn = true;
+            //TODO: Complete bridge part
+        }
     }
 
     void OnTriggerEnter(Collider other)
