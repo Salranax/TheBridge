@@ -51,7 +51,7 @@ public class GridSystem : MonoBehaviour
             }
         }
 
-        transform.position = new Vector3(-grid.GetLength(0) / 2, -grid.GetLength(1) / 5 + 1.4f, 0);
+        transform.position = new Vector3(-grid.GetLength(0) / 2, -grid.GetLength(1) / 5 + 7.1f, 0);
         GameObject enemy1 = Instantiate(Resources.Load("Enemy")) as GameObject;
         enemy1.transform.SetParent(this.transform);
         enemy1.transform.localPosition = new Vector3(5, 9, -0.5f);

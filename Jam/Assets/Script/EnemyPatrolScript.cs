@@ -19,7 +19,6 @@ public class EnemyPatrolScript : MonoBehaviour
     }
 
     public void moveEnemy(){
-        Debug.Log("Enemy");
         if(GridSystem.instance.grid[gridX + 1, gridY] == gridType.floor){
 
         }
@@ -29,6 +28,5 @@ public class EnemyPatrolScript : MonoBehaviour
 
         transform.localPosition = new Vector3(gridX + dir, gridY, -0.5f);
         gridX = gridX + dir;
-        GridSystem.instance.grid[gridX, gridY] = gridType.enemy;
     }
 }
