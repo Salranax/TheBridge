@@ -80,6 +80,11 @@ public class GridSystem : MonoBehaviour
         enemy1.transform.SetParent(this.transform);
         enemy1.transform.localPosition = new Vector3(5, 9, -0.5f);
         enemy1.GetComponent<EnemyPatrolScript>().enemy(5, 9);
+        GameObject enemy2 = Instantiate(Resources.Load("Enemy")) as GameObject;
+        enemy2.transform.SetParent(this.transform);
+        enemy2.transform.localPosition = new Vector3(4, 11, -0.5f);
+        enemy2.GetComponent<EnemyPatrolScript>().enemy(4, 11);
+        LevelGenerator.instance.spawnEnemies = new EnemyPatrolScript[2]{enemy1.GetComponent<EnemyPatrolScript>(), enemy2.GetComponent<EnemyPatrolScript>()};
     }
 
     public void whiten(int y)

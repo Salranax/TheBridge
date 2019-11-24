@@ -26,12 +26,10 @@ public class CameraManager : MonoBehaviour
         while(degree < 1){
             degree += Time.deltaTime;
             transform.eulerAngles = new Vector3(transform.localRotation.eulerAngles.x, Mathf.Lerp(90,0,degree), 0);
-            //transform.rotation = startOrientation*Quaternion.AngleAxis(Mathf.Lerp(90,0,degree), axis);
             yield return new WaitForEndOfFrame();
         }
 
         transform.eulerAngles = new Vector3(transform.localRotation.eulerAngles.x,0, 0);
-        //transform.rotation = startOrientation * Quaternion.AngleAxis(0, axis);
 
         TickManager.instance.startGame();
 
