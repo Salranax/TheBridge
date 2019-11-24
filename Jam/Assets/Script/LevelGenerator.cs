@@ -41,12 +41,10 @@ public class LevelGenerator : MonoBehaviour
     }
 
     public void increaseSpotOrder(){
-        Debug.Log(spots.Length + " " + spotOrder);
         if(spotOrder + 2 <= spots.Length){
            spotOrder ++;
         }
         else{
-            Debug.Log("complete");
             isObjectiveComplete = true;
         }
     }

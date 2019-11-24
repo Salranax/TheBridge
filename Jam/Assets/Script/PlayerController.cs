@@ -37,15 +37,14 @@ public class PlayerController : MonoBehaviour
         if(!resetTurn && !isTooMuch){
             if(isSwiped){
                 if(dir == SwipeDirection.Left){
-                    GridSystem.gridType tmpType = GridSystem.instance.grid[gridX , gridY + 1];
+                    GridSystem.gridType tmpType = GridSystem.instance.grid[gridX - 1, gridY];
                     if(tmpType == GridSystem.gridType.floor || tmpType == GridSystem.gridType.slot){
                         gridX -= 1;
                         StartCoroutine(Rotate90(Vector3.up, new Vector3(gridX, gridY, -0.5f)));
                     }
-    
                 }
                 else if(dir == SwipeDirection.Right){
-                    GridSystem.gridType tmpType = GridSystem.instance.grid[gridX , gridY + 1];
+                    GridSystem.gridType tmpType = GridSystem.instance.grid[gridX + 1, gridY];
                     if(tmpType == GridSystem.gridType.floor || tmpType == GridSystem.gridType.slot){
                         gridX += 1;
                         StartCoroutine(Rotate90(-Vector3.up, new Vector3(gridX, gridY, -0.5f)));
@@ -64,7 +63,7 @@ public class PlayerController : MonoBehaviour
                         StartCoroutine("passedSlot");
                     }
                     StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
-                    if(LevelGenerator.instance.spotOrder == 0 || (LevelGenerator.instance.spotOrder < LevelGenerator.instance.spots.Length && gridY > LevelGenerator.instance.spots[LevelGenerator.instance.spotOrder - 1].y)){
+                    if((LevelGenerator.instance.spotOrder == 0 || (LevelGenerator.instance.spotOrder < LevelGenerator.instance.spots.Length && gridY > LevelGenerator.instance.spots[LevelGenerator.instance.spotOrder - 1].y)) && !LevelGenerator.instance.isObjectiveComplete){
                         StartCoroutine("dimLight");
                     }
                 }
@@ -92,8 +91,10 @@ public class PlayerController : MonoBehaviour
     }
 
     public void getSwipe(SwipeData dt){
-        isSwiped = true;
         dir = dt.Direction;
+        if(dir == SwipeDirection.Left || dir == SwipeDirection.Right){
+            isSwiped = true;
+        }
     }
 
     public void swipeRight(){

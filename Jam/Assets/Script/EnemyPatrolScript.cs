@@ -6,6 +6,7 @@ public class EnemyPatrolScript : MonoBehaviour
 {
     public int gridX,gridY;
     private int dir = 1;
+    private bool transforming = false;
     Quaternion startOrientation;
 
     public void enemy(int gx, int gy){
@@ -20,22 +21,25 @@ public class EnemyPatrolScript : MonoBehaviour
     }
 
     public void moveEnemy(){
-        if(dir > 0){
-            if(GridSystem.instance.grid[gridX + 1, gridY] != GridSystem.gridType.floor){
-                dir *= -1;
+        if(!transforming){
+            if(dir > 0){
+                if(GridSystem.instance.grid[gridX + 1, gridY] != GridSystem.gridType.floor){
+                    dir *= -1;
+                }
             }
-        }
-        else if(dir < 0){
-            if(GridSystem.instance.grid[gridX - 1, gridY] != GridSystem.gridType.floor){
-                dir *= -1;
+            else if(dir < 0){
+                if(GridSystem.instance.grid[gridX - 1, gridY] != GridSystem.gridType.floor){
+                    dir *= -1;
+                }
             }
+            
+            gridX = gridX + dir;
+            StartCoroutine(Rotate90(dir == 1 ? -Vector3.up : Vector3.up , new Vector3(gridX, gridY, -0.5f)));
         }
-        
-        gridX = gridX + dir;
-        StartCoroutine(Rotate90(dir == 1 ? -Vector3.up : Vector3.up , new Vector3(gridX, gridY, -0.5f)));
     }
 
     public void activateSpawnPoint(){
+        transforming = true;
         TickManager.instance.tick.RemoveListener(moveEnemy);
         StartCoroutine("transformToPlayer");
     }
@@ -49,10 +53,15 @@ public class EnemyPatrolScript : MonoBehaviour
             amount += Time.deltaTime * 4;
             transform.rotation = startOrientation*Quaternion.AngleAxis(Mathf.Lerp(0,90,amount), axis);
             transform.localPosition = Vector3.Lerp(transform.localPosition, finalPos, amount/ 3);
+            if(transforming){
+                break;
+            }
             yield return new WaitForEndOfFrame();
         }
-        transform.rotation = startOrientation * Quaternion.AngleAxis(90, axis);
-        transform.localPosition = finalPos;
+        if(!transforming){
+            transform.rotation = startOrientation * Quaternion.AngleAxis(90, axis);
+            transform.localPosition = finalPos;
+        }
     }
 
     private IEnumerator transformToPlayer(){

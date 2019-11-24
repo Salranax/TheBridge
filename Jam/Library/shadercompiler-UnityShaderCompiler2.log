@@ -1,5 +1,9 @@
 Base path: '/Applications/Unity/Hub/Editor/2019.2.13f1/Unity.app/Contents', plugins path '/Applications/Unity/Hub/Editor/2019.2.13f1/Unity.app/Contents/PlaybackEngines'
 Cmd: initializeCompiler
+Cmd: compileComputeKernel
+  api=14 insize=4855 outsize=5525 ok=1
+Cmd: translateComputeKernel
+  api=14 insize=11222 outsize=18583 ok=1
 Unhandled exception: Protocol error - unexpected end of data (did the Editor crash?)
 
 Quitting shader compiler process
