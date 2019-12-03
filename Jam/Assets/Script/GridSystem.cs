@@ -35,14 +35,23 @@ public class GridSystem : MonoBehaviour
                     if ((i == 5 && j == 7))
                     {
                         grid[i, j] = gridType.slot;
+                        GameObject tmp = Instantiate(Resources.Load("Slot")) as GameObject;
+                        tmp.transform.SetParent(this.gameObject.transform);
+                        tmp.transform.localPosition = new Vector2(5, 7);
                     }
                     else if (i == 7 && j == 11)
                     {
                         grid[i, j] = gridType.slot;
+                        GameObject tmp = Instantiate(Resources.Load("Slot")) as GameObject;
+                        tmp.transform.SetParent(this.gameObject.transform);
+                        tmp.transform.localPosition = new Vector2(7, 11);
                     }
                     else if (i == 8 && j == 14)
                     {
                         grid[i, j] = gridType.slot;
+                        GameObject tmp = Instantiate(Resources.Load("Slot")) as GameObject;
+                        tmp.transform.SetParent(this.gameObject.transform);
+                        tmp.transform.localPosition = new Vector2(8, 14);
                     }
                     else
                     {
