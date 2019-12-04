@@ -58,12 +58,12 @@ public class PlayerController : MonoBehaviour
                 GridSystem.gridType tmpType = GridSystem.instance.grid[gridX , gridY + 1];
                 if(tmpType == GridSystem.gridType.floor || tmpType == GridSystem.gridType.slot){
                     gridY += 1;
-                    if(LevelGenerator.instance.spots[LevelGenerator.instance.spotOrder].y < gridY - 1  && !LevelGenerator.instance.isObjectiveComplete){
+                    if(LevelGenerator.instance.slots[LevelGenerator.instance.spotOrder].getCoord().y < gridY - 1  && !LevelGenerator.instance.isObjectiveComplete){
                         isTooMuch = true;
                         StartCoroutine("passedSlot");
                     }
                     StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
-                    if((LevelGenerator.instance.spotOrder == 0 || (LevelGenerator.instance.spotOrder < LevelGenerator.instance.spots.Length && gridY > LevelGenerator.instance.spots[LevelGenerator.instance.spotOrder - 1].y)) && !LevelGenerator.instance.isObjectiveComplete){
+                    if((LevelGenerator.instance.spotOrder == 0 || (LevelGenerator.instance.spotOrder < LevelGenerator.instance.slots.Length && gridY > LevelGenerator.instance.slots[LevelGenerator.instance.spotOrder - 1].getCoord().y)) && !LevelGenerator.instance.isObjectiveComplete){
                         StartCoroutine("dimLight");
                     }
                 }
@@ -172,16 +172,16 @@ public class PlayerController : MonoBehaviour
             resetTurn = true;
             
             LevelGenerator.instance.increaseSpotOrder();
-            GridSystem.instance.whiten(gridY);
+            //GridSystem.instance.whiten(gridY);
         }
-        if(LevelGenerator.instance.spotOrder == LevelGenerator.instance.spots.Length - 1 && LevelGenerator.instance.isObjectiveComplete){
-            for (int i = 0; i < GridSystem.instance.cubeGrid.GetLength(0); i++)
-            {
-                Cube tmpCube = GridSystem.instance.cubeGrid[i,gridY];
-                if(tmpCube != null){
-                    tmpCube.setColor(Color.white);
-                }
-            }
+        if(LevelGenerator.instance.spotOrder == LevelGenerator.instance.slots.Length - 1 && LevelGenerator.instance.isObjectiveComplete){
+            // for (int i = 0; i < GridSystem.instance.cubeGrid.GetLength(0); i++)
+            // {
+            //     Cube tmpCube = GridSystem.instance.cubeGrid[i,gridY];
+            //     if(tmpCube != null){
+            //         tmpCube.setColor(Color.white);
+            //     }
+            // }
             if(gridY >= 22){
                 TickManager.instance.SetIsGameStarted(false);
                 UIManager.instance.win();
@@ -227,7 +227,7 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForEndOfFrame();
     }
 
-        IEnumerator passedSlot(){
+    IEnumerator passedSlot(){
         float t = 0;
         Material tmpMat = GetComponent<Renderer>().material;
         

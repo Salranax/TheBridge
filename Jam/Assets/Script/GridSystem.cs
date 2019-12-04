@@ -38,6 +38,8 @@ public class GridSystem : MonoBehaviour
                         GameObject tmp = Instantiate(Resources.Load("Slot")) as GameObject;
                         tmp.transform.SetParent(this.gameObject.transform);
                         tmp.transform.localPosition = new Vector2(5, 7);
+                        LevelGenerator.instance.slots[0] = tmp.GetComponent<Slot>();
+                        tmp.GetComponent<Slot>().setCoord(new Vector2(5, 7));
                     }
                     else if (i == 7 && j == 11)
                     {
@@ -45,6 +47,8 @@ public class GridSystem : MonoBehaviour
                         GameObject tmp = Instantiate(Resources.Load("Slot")) as GameObject;
                         tmp.transform.SetParent(this.gameObject.transform);
                         tmp.transform.localPosition = new Vector2(7, 11);
+                        LevelGenerator.instance.slots[1] = tmp.GetComponent<Slot>();
+                        tmp.GetComponent<Slot>().setCoord(new Vector2(7, 11));
                     }
                     else if (i == 8 && j == 14)
                     {
@@ -52,6 +56,8 @@ public class GridSystem : MonoBehaviour
                         GameObject tmp = Instantiate(Resources.Load("Slot")) as GameObject;
                         tmp.transform.SetParent(this.gameObject.transform);
                         tmp.transform.localPosition = new Vector2(8, 14);
+                        LevelGenerator.instance.slots[2] = tmp.GetComponent<Slot>();
+                        tmp.GetComponent<Slot>().setCoord(new Vector2(8, 14));
                     }
                     else
                     {
@@ -61,23 +67,23 @@ public class GridSystem : MonoBehaviour
                         cubeGrid[i, j] = tmp.GetComponent<Cube>();
                         tmp.name = i + "/" + j;
                         grid[i, j] = gridType.floor;
-                        if (j < 3 && cubeGrid[i, j] != null)
-                        {
-                            cubeGrid[i, j].setColor(new Color(1, 1, 1, 1));
-                        }
+                        // if (j < 3 && cubeGrid[i, j] != null)
+                        // {
+                        //     cubeGrid[i, j].setColor(new Color(1, 1, 1, 1));
+                        // }
 
-                        else if ((j > 2 && j < 18) && cubeGrid[i, j] != null)
-                        {
-                            float a = 255 / 15;
-                            cubeGrid[i, j].setColor(new Color((255 - a * j) / 255, (255 - a * j) / 255,
-                                (255 - a * j) / 255, 1));
+                        // else if ((j > 2 && j < 18) && cubeGrid[i, j] != null)
+                        // {
+                        //     float a = 255 / 15;
+                        //     cubeGrid[i, j].setColor(new Color((255 - a * j) / 255, (255 - a * j) / 255,
+                        //         (255 - a * j) / 255, 1));
 
-                            // cubeGrid[i,j].setColor(new Color32(138,138,138,255));
-                        }
-                        else if (j > 17 && cubeGrid[i, j] != null)
-                        {
-                            cubeGrid[i, j].setColor(new Color32(0,0,0,1));
-                        }
+                        //     // cubeGrid[i,j].setColor(new Color32(138,138,138,255));
+                        // }
+                        // else if (j > 17 && cubeGrid[i, j] != null)
+                        // {
+                        //     cubeGrid[i, j].setColor(new Color32(0,0,0,1));
+                        // }
 
                     }
                 }

@@ -7,6 +7,8 @@ ScriptsOnlyBuild:
     - GridSystem
     - LevelGenerator
     - PlayerController
+    - Slot
+    - SpotlightFollow
     - SwipeManager
     - TickManager
     - UIManager
@@ -91,6 +93,10 @@ ScriptsOnlyBuild:
       Script: {instanceID: 12038}
     - Class: 114
       Script: {instanceID: 12166}
+    - Class: 114
+      Script: {instanceID: 21712}
+    - Class: 114
+      Script: {instanceID: 77344}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -356,7 +362,7 @@ ScriptsOnlyBuild:
     className: Mask
   - hash:
       serializedVersion: 2
-      Hash: e424e6e3cf091c4ac547a82bbdf8ec95
+      Hash: 51153c00097563da7fac6e9f650f1bf5
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: LevelGenerator
@@ -822,7 +828,19 @@ ScriptsOnlyBuild:
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: PlayerScript
+  - hash:
+      serializedVersion: 2
+      Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: SpotlightFollow
+  - hash:
+      serializedVersion: 2
+      Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: Slot
   platform: 13
   scenePathNames:
   - Assets/Scenes/GameScene.unity
-  playerPath: /Users/alper/Desktop/JamGameBuilds/TestTwo.apk
+  playerPath: /Users/alper/Desktop/JamGameBuilds/Prototype0.1v.apk

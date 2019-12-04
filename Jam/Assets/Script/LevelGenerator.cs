@@ -5,7 +5,7 @@ using UnityEngine;
 public class LevelGenerator : MonoBehaviour
 {
     public static LevelGenerator instance;
-    public Vector2[] spots;
+    public Slot[] slots;
     public int spotOrder;
     public EnemyPatrolScript[] spawnEnemies;
     public int spawnEnemyNumber = 0;
@@ -16,7 +16,7 @@ public class LevelGenerator : MonoBehaviour
     }
 
     private void Start() {
-        spots = new Vector2[3]{new Vector2(5,7), new Vector2(7,11), new Vector2(8,14)};
+        slots = new Slot[3];
     }
 
     private void Awake() {
@@ -41,7 +41,7 @@ public class LevelGenerator : MonoBehaviour
     }
 
     public void increaseSpotOrder(){
-        if(spotOrder + 2 <= spots.Length){
+        if(spotOrder + 2 <= slots.Length){
            spotOrder ++;
         }
         else{
