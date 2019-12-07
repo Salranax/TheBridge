@@ -7,6 +7,7 @@ public class EnemyPatrolScript : MonoBehaviour
     public int gridX,gridY;
     private int dir = 1;
     private bool transforming = false;
+    private float tickInterval;
     Quaternion startOrientation;
 
     public void enemy(int gx, int gy){
@@ -18,17 +19,20 @@ public class EnemyPatrolScript : MonoBehaviour
     void Start()
     {
         TickManager.instance.tick.AddListener(moveEnemy);
+        TickManager.instance.tickTimeChanged.AddListener(intervalChange);
+
+        tickInterval = TickManager.instance.GetTickInterval();
     }
 
     public void moveEnemy(){
         if(!transforming){
             if(dir > 0){
-                if(GridSystem.instance.grid[gridX + 1, gridY] != GridSystem.gridType.floor){
+                if(GridSystem.instance.grid[gridX + 1, gridY] != gridType.floor){
                     dir *= -1;
                 }
             }
             else if(dir < 0){
-                if(GridSystem.instance.grid[gridX - 1, gridY] != GridSystem.gridType.floor){
+                if(GridSystem.instance.grid[gridX - 1, gridY] != gridType.floor){
                     dir *= -1;
                 }
             }
@@ -49,10 +53,10 @@ public class EnemyPatrolScript : MonoBehaviour
         axis = transform.InverseTransformDirection(axis);
         float amount = 0;
 
-        while (amount < 1) {
-            amount += Time.deltaTime * 4;
-            transform.rotation = startOrientation*Quaternion.AngleAxis(Mathf.Lerp(0,90,amount), axis);
-            transform.localPosition = Vector3.Lerp(transform.localPosition, finalPos, amount/ 3);
+        while (amount < tickInterval / 2) {
+            amount += Time.deltaTime;
+            transform.rotation = startOrientation*Quaternion.AngleAxis(Mathf.Lerp(0,90,amount / tickInterval * 2), axis);
+            transform.localPosition = Vector3.Lerp(transform.localPosition, finalPos, amount / tickInterval * 2 / 3);
             if(transforming){
                 break;
             }
@@ -70,16 +74,20 @@ public class EnemyPatrolScript : MonoBehaviour
         
         Color currentColor = tmpMat.GetColor("_EmissionColor");
 
-        while (t < 0.5f)
+        while (t < tickInterval)
         {
             tmpMat.EnableKeyword("_EMISSION");
-            tmpMat.SetColor("_EmissionColor", Color.Lerp(Color.black, PlayerController.instance.startEmissionColor, t * 2));
-            tmpMat.color = Color.Lerp(Color.black, Color.white, t * 2);
+            tmpMat.SetColor("_EmissionColor", Color.Lerp(Color.black, PlayerController.instance.startEmissionColor, t / tickInterval * 2));
+            tmpMat.color = Color.Lerp(Color.black, Color.white, t / tickInterval * 2);
             t += Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
 
         this.gameObject.SetActive(false);
         yield return new WaitForEndOfFrame();
+    }
+
+    private void intervalChange(){
+        tickInterval = TickManager.instance.GetTickInterval();
     }
 }

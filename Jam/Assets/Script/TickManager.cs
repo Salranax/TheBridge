@@ -7,10 +7,10 @@ public class TickManager : MonoBehaviour
 {
     public static TickManager instance;
 
-    public float tickInterval = 1f;
+    private float tickInterval = 0.35f;
     public UnityEvent tick;
-
-
+    public UnityEvent tickTimeChanged;
+    
     private float tickTime = 0;
     private bool isGameStarted = false;
 
@@ -35,7 +35,6 @@ public class TickManager : MonoBehaviour
         }    
     }
 
-    // Update is called once per frame
     void Update()
     {
         if(isGameStarted){
@@ -46,5 +45,14 @@ public class TickManager : MonoBehaviour
                 tickTime = 0f;
             }
         }
+    }
+
+    public void SetTickInterval(float i){
+        tickInterval = i;
+        tickTimeChanged.Invoke();
+    }
+
+    public float GetTickInterval(){
+        return tickInterval;
     }
 }

@@ -15,7 +15,8 @@ public class PlayerController : MonoBehaviour
     private bool isSwiped = false;
     private bool resetTurn = false;
     private bool isTooMuch = false;
-    private int startX = 6, startY = 2;
+    private int startX = 0, startY = 4;
+    private float tickInterval;
     public Color startEmissionColor;
 
     void Awake() {
@@ -26,10 +27,13 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        gridX = 6;
-        gridY = 2;
-        TickManager.instance.tick.AddListener(movePlayer);
-        transform.localPosition = new Vector3(gridX, gridY, -0.5f);
+
+        //TickManager.instance.tick.AddListener(movePlayer);
+        TickManager.instance.tickTimeChanged.AddListener(intervalChanged);
+
+        tickInterval = TickManager.instance.GetTickInterval();
+
+        transform.localPosition = new Vector3(0, 4, -0.5f);
         startEmissionColor = GetComponent<Renderer>().material.GetColor("_EmissionColor");
     }
 
@@ -37,15 +41,16 @@ public class PlayerController : MonoBehaviour
         if(!resetTurn && !isTooMuch){
             if(isSwiped){
                 if(dir == SwipeDirection.Left){
-                    GridSystem.gridType tmpType = GridSystem.instance.grid[gridX - 1, gridY];
-                    if(tmpType == GridSystem.gridType.floor || tmpType == GridSystem.gridType.slot){
+                    gridType tmpType = GridSystem.instance.grid[gridX - 1, gridY];
+                    if(tmpType == gridType.floor || tmpType == gridType.slot){
                         gridX -= 1;
                         StartCoroutine(Rotate90(Vector3.up, new Vector3(gridX, gridY, -0.5f)));
                     }
                 }
                 else if(dir == SwipeDirection.Right){
-                    GridSystem.gridType tmpType = GridSystem.instance.grid[gridX + 1, gridY];
-                    if(tmpType == GridSystem.gridType.floor || tmpType == GridSystem.gridType.slot){
+                    
+                gridType tmpType = GridSystem.instance.grid[gridX + 1, gridY];
+                    if(tmpType == gridType.floor || tmpType == gridType.slot){
                         gridX += 1;
                         StartCoroutine(Rotate90(-Vector3.up, new Vector3(gridX, gridY, -0.5f)));
                     }
@@ -55,8 +60,8 @@ public class PlayerController : MonoBehaviour
             }
             else{
                 //Debug.Log(gridX + " " + gridY);
-                GridSystem.gridType tmpType = GridSystem.instance.grid[gridX , gridY + 1];
-                if(tmpType == GridSystem.gridType.floor || tmpType == GridSystem.gridType.slot){
+                gridType tmpType = GridSystem.instance.grid[gridX , gridY + 1];
+                if(tmpType == gridType.floor || tmpType == gridType.slot){
                     gridY += 1;
                     if(LevelGenerator.instance.slots[LevelGenerator.instance.spotOrder].getCoord().y < gridY - 1  && !LevelGenerator.instance.isObjectiveComplete){
                         isTooMuch = true;
@@ -83,8 +88,8 @@ public class PlayerController : MonoBehaviour
         Color currentColor = tmpMat.GetColor("_EmissionColor");
         Color targetColor = new Color(currentColor.r * 0.7f, currentColor.g * 0.7f, currentColor.b * 0.7f, currentColor.a);
 
-        while(t < 0.2f){
-            tmpMat.SetColor("_EmissionColor", Color.Lerp(currentColor, targetColor, t * 5));
+        while(t < tickInterval / 2){
+            tmpMat.SetColor("_EmissionColor", Color.Lerp(currentColor, targetColor, t / tickInterval * 2 * 5));
             t += Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }        
@@ -137,27 +142,27 @@ public class PlayerController : MonoBehaviour
         transform.rotation = Quaternion.identity;
         resetTurn = false;
     }
- 
+
     private IEnumerator Rotate90(Vector3 axis, Vector3 finalPos) {
         startOrientation = transform.rotation;
         axis = transform.InverseTransformDirection(axis);
         float amount = 0;
 
-        while (amount < 1) {
+        while (amount < tickInterval / 2) {
+            amount += Time.deltaTime;
+            transform.rotation = startOrientation*Quaternion.AngleAxis(Mathf.Lerp(0,90,amount / tickInterval * 2), axis);
+            transform.localPosition = Vector3.Lerp(transform.localPosition, finalPos, amount / tickInterval * 2 / 3);
             yield return new WaitForEndOfFrame();
-            amount += Time.deltaTime * 4;
-            transform.rotation = startOrientation*Quaternion.AngleAxis(Mathf.Lerp(0,90,amount), axis);
-            transform.localPosition = Vector3.Lerp(transform.localPosition, finalPos, amount/ 3);
         }
         transform.rotation = startOrientation * Quaternion.AngleAxis(90, axis);
         transform.localPosition = finalPos;
 
-        GridSystem.gridType tmpType = GridSystem.instance.grid[gridX , gridY];
-        if(tmpType == GridSystem.gridType.slot){
+        gridType tmpType = GridSystem.instance.grid[gridX , gridY];
+        if(tmpType == gridType.slot){
             float time = 0;
 
-            while(time < 0.1f){
-                transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(transform.localPosition.x, transform.localPosition.y, 0.3f), time * 10);
+            while(time < tickInterval / 5){
+                transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(transform.localPosition.x, transform.localPosition.y, 0.3f), time / tickInterval * 5);
                 time += Time.deltaTime;
                 yield return new WaitForEndOfFrame();
             }
@@ -167,7 +172,7 @@ public class PlayerController : MonoBehaviour
             tmp.transform.SetParent(GridSystem.instance.transform);
             tmp.transform.position = new Vector3(transform.position.x, transform.position.y, 0);
             
-            GridSystem.instance.grid[gridX , gridY] = GridSystem.gridType.floor;
+            GridSystem.instance.grid[gridX , gridY] = gridType.floor;
             GridSystem.instance.cubeGrid[gridX, gridY] = tmp.GetComponent<Cube>();
             resetTurn = true;
             
@@ -203,9 +208,9 @@ public class PlayerController : MonoBehaviour
         
         Color currentColor = tmpMat.GetColor("_EmissionColor");
 
-        while(t < 0.25f){
-            transform.localScale = Vector3.Lerp(new Vector3(1,1,1), new Vector3(0,0,0),t * 4);
-            tmpMat.SetColor("_EmissionColor", Color.Lerp(currentColor, Color.black, t * 4));
+        while(t < tickInterval / 2){
+            transform.localScale = Vector3.Lerp(new Vector3(1,1,1), new Vector3(0,0,0),t / tickInterval * 4);
+            tmpMat.SetColor("_EmissionColor", Color.Lerp(currentColor, Color.black, t / tickInterval * 2));
             tmpMat.color = Color.Lerp(Color.white, Color.black, t * 4);
             t += Time.deltaTime;
             yield return new WaitForEndOfFrame();
@@ -213,9 +218,9 @@ public class PlayerController : MonoBehaviour
 
         resetPlayer();
 
-        while(t < 0.5f){
-            transform.localScale = Vector3.Lerp(new Vector3(0,0,0), new Vector3(1,1,1),t * 2);
-            tmpMat.SetColor("_EmissionColor", Color.Lerp(Color.black, startEmissionColor, t * 2));
+        while(t < tickInterval){
+            transform.localScale = Vector3.Lerp(new Vector3(0,0,0), new Vector3(1,1,1),t / tickInterval * 2);
+            tmpMat.SetColor("_EmissionColor", Color.Lerp(Color.black, startEmissionColor, t / tickInterval));
             tmpMat.color = Color.Lerp(Color.black, Color.white, t * 2);
             t += Time.deltaTime;
             yield return new WaitForEndOfFrame();
@@ -233,9 +238,9 @@ public class PlayerController : MonoBehaviour
         
         Color currentColor = tmpMat.GetColor("_EmissionColor");
 
-        while(t < 0.5f){
-            tmpMat.SetColor("_EmissionColor", Color.Lerp(currentColor, Color.black, t * 2));
-            tmpMat.color = Color.Lerp(Color.white, Color.black, t * 4);
+        while(t < tickInterval){
+            tmpMat.SetColor("_EmissionColor", Color.Lerp(currentColor, Color.black, t / tickInterval * 2));
+            tmpMat.color = Color.Lerp(Color.white, Color.black, t / tickInterval * 2);
             t += Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
@@ -244,9 +249,9 @@ public class PlayerController : MonoBehaviour
 
         t = 0;
 
-        while(t < 0.5f){
-            tmpMat.SetColor("_EmissionColor", Color.Lerp(Color.black, startEmissionColor, t * 2));
-            tmpMat.color = Color.Lerp(Color.black, Color.white, t * 2);
+        while(t < tickInterval){
+            tmpMat.SetColor("_EmissionColor", Color.Lerp(Color.black, startEmissionColor, t / tickInterval));
+            tmpMat.color = Color.Lerp(Color.black, Color.white, t / tickInterval);
             t += Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
@@ -259,5 +264,7 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForEndOfFrame();
     }
 
-
+    private void intervalChanged(){
+        tickInterval = TickManager.instance.GetTickInterval();
+    }
 }
