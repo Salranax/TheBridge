@@ -7,6 +7,8 @@ public class PlayerController : MonoBehaviour
     public static PlayerController instance;
     
     public int gridX, gridY;
+    private GridModule currentModule;
+    private Vector2 currentGridCoord;
 
 
     Quaternion startOrientation;
@@ -15,7 +17,7 @@ public class PlayerController : MonoBehaviour
     private bool isSwiped = false;
     private bool resetTurn = false;
     private bool isTooMuch = false;
-    private int startX = 0, startY = 4;
+    private int startX = 5, startY = 3;
     private float tickInterval;
     public Color startEmissionColor;
 
@@ -28,52 +30,123 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
 
-        //TickManager.instance.tick.AddListener(movePlayer);
+        TickManager.instance.tick.AddListener(movePlayer);
         TickManager.instance.tickTimeChanged.AddListener(intervalChanged);
 
         tickInterval = TickManager.instance.GetTickInterval();
 
-        transform.localPosition = new Vector3(0, 4, -0.5f);
+        //transform.localPosition = new Vector3(0, 4, -0.5f);
         startEmissionColor = GetComponent<Renderer>().material.GetColor("_EmissionColor");
+    }
+
+    public void setPlayer(GridModule module){
+        this.transform.SetParent(module.gameObject.transform);
+        gridY = 3;
+        gridX = 5;
+        transform.localPosition = new Vector3(5, 3, -0.5f);
     }
 
     public void movePlayer(){
         if(!resetTurn && !isTooMuch){
-            if(isSwiped){
+            if(isSwiped && dir != SwipeDirection.Down){
                 if(dir == SwipeDirection.Left){
-                    gridType tmpType = GridSystem.instance.grid[gridX - 1, gridY];
-                    if(tmpType == gridType.floor || tmpType == gridType.slot){
-                        gridX -= 1;
+                    if(gridX == 0){
+                        //fall
+                        Debug.Log("Fall");
+                    }
+                    else{
+                        gridX--;
                         StartCoroutine(Rotate90(Vector3.up, new Vector3(gridX, gridY, -0.5f)));
                     }
                 }
                 else if(dir == SwipeDirection.Right){
-                    
-                gridType tmpType = GridSystem.instance.grid[gridX + 1, gridY];
-                    if(tmpType == gridType.floor || tmpType == gridType.slot){
-                        gridX += 1;
+                    if(currentModule.gridSizeX - 1 == gridX){
+                        //fall
+                        Debug.Log("Fall");
+                    }
+                    else{
+                        gridX++;
                         StartCoroutine(Rotate90(-Vector3.up, new Vector3(gridX, gridY, -0.5f)));
                     }
-
                 }
+
                 isSwiped = false;
             }
             else{
-                //Debug.Log(gridX + " " + gridY);
-                gridType tmpType = GridSystem.instance.grid[gridX , gridY + 1];
-                if(tmpType == gridType.floor || tmpType == gridType.slot){
-                    gridY += 1;
-                    if(LevelGenerator.instance.slots[LevelGenerator.instance.spotOrder].getCoord().y < gridY - 1  && !LevelGenerator.instance.isObjectiveComplete){
-                        isTooMuch = true;
-                        StartCoroutine("passedSlot");
+                if(currentModule.getGridSizeY() - 1 == gridY){
+                    //Move to next Grid Module
+                    GridModule tmpOld = currentModule;
+                    currentModule = GridSystem.instance.getNextModule();
+                    GridSystem.instance.moveToNextModule();
+
+                    this.transform.SetParent(currentModule.gameObject.transform);
+                    
+                    if(GridSystem.instance.canPassToNext(tmpOld, currentModule, new Vector2(gridX, gridY))){
+                        Vector2 newGridCoord = GridSystem.instance.positionOnNextGrid(tmpOld, currentModule, new Vector2(gridX, gridY));
+                        gridX = Mathf.FloorToInt(newGridCoord.x);
+                        gridY = Mathf.FloorToInt(newGridCoord.y);
+                        StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
                     }
-                    StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
-                    if((LevelGenerator.instance.spotOrder == 0 || (LevelGenerator.instance.spotOrder < LevelGenerator.instance.slots.Length && gridY > LevelGenerator.instance.slots[LevelGenerator.instance.spotOrder - 1].getCoord().y)) && !LevelGenerator.instance.isObjectiveComplete){
-                        StartCoroutine("dimLight");
+                    else{
+                        Debug.Log("Fall");
+                        //Gonna Fall
+                    }
+                    
+                }
+                else{
+                    gridType tmpType = currentModule.gridArrangement[gridY + 1, gridX];
+                    Debug.Log(tmpType);
+                    if(tmpType == gridType.floor || tmpType == gridType.slot){
+                        Debug.Log("Move");
+                        gridY += 1;
+                        // if(LevelGenerator.instance.slots[LevelGenerator.instance.spotOrder].getCoord().y < gridY - 1  && !LevelGenerator.instance.isObjectiveComplete){
+                        //     isTooMuch = true;
+                        //     StartCoroutine("passedSlot");
+                        // }
+                        StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
+                        // if((LevelGenerator.instance.spotOrder == 0 || (LevelGenerator.instance.spotOrder < LevelGenerator.instance.slots.Length && gridY > LevelGenerator.instance.slots[LevelGenerator.instance.spotOrder - 1].getCoord().y)) && !LevelGenerator.instance.isObjectiveComplete){
+                        //     StartCoroutine("dimLight");
+                        // }
                     }
                 }
 
+                Debug.Log(gridX + " / " + gridY);
             }
+            // if(isSwiped){
+            //     if(dir == SwipeDirection.Left){
+            //         gridType tmpType = GridSystem.instance.grid[gridX - 1, gridY];
+            //         if(tmpType == gridType.floor || tmpType == gridType.slot){
+            //             gridX -= 1;
+            //             StartCoroutine(Rotate90(Vector3.up, new Vector3(gridX, gridY, -0.5f)));
+            //         }
+            //     }
+            //     else if(dir == SwipeDirection.Right){
+                    
+            //     gridType tmpType = GridSystem.instance.grid[gridX + 1, gridY];
+            //         if(tmpType == gridType.floor || tmpType == gridType.slot){
+            //             gridX += 1;
+            //             StartCoroutine(Rotate90(-Vector3.up, new Vector3(gridX, gridY, -0.5f)));
+            //         }
+
+            //     }
+            //     isSwiped = false;
+            // }
+            // else{
+            //     //Debug.Log(gridX + " " + gridY);
+            //     gridType tmpType = GridSystem.instance.grid[gridX , gridY + 1];
+            //     if(tmpType == gridType.floor || tmpType == gridType.slot){
+            //         gridY += 1;
+            //         if(LevelGenerator.instance.slots[LevelGenerator.instance.spotOrder].getCoord().y < gridY - 1  && !LevelGenerator.instance.isObjectiveComplete){
+            //             isTooMuch = true;
+            //             StartCoroutine("passedSlot");
+            //         }
+            //         StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
+            //         if((LevelGenerator.instance.spotOrder == 0 || (LevelGenerator.instance.spotOrder < LevelGenerator.instance.slots.Length && gridY > LevelGenerator.instance.slots[LevelGenerator.instance.spotOrder - 1].getCoord().y)) && !LevelGenerator.instance.isObjectiveComplete){
+            //             StartCoroutine("dimLight");
+            //         }
+            //     }
+
+            // }
         }
         else{
             resetPlayer();
@@ -187,10 +260,10 @@ public class PlayerController : MonoBehaviour
             //         tmpCube.setColor(Color.white);
             //     }
             // }
-            if(gridY >= 22){
-                TickManager.instance.SetIsGameStarted(false);
-                UIManager.instance.win();
-            }
+            // if(gridY >= 22){
+            //     TickManager.instance.SetIsGameStarted(false);
+            //     UIManager.instance.win();
+            // }
         }
     }
 
@@ -266,5 +339,13 @@ public class PlayerController : MonoBehaviour
 
     private void intervalChanged(){
         tickInterval = TickManager.instance.GetTickInterval();
+    }
+
+    public void setCurrentModule(GridModule gm){
+        currentModule = gm;
+    }
+
+    public GridModule getCurrentModule(){
+        return currentModule;
     }
 }

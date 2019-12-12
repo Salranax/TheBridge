@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class GridModule : MonoBehaviour
 {
-    private int gridSizeX, gridSizeY;
-    private int offset;
-    private gridType[] gridArrangement;
+    public int gridSizeX, gridSizeY;
+    public int offset;
+    public gridType[,] gridArrangement;
+    private GameObject[,] gridObjects;
     private bool isFirst;
 
     //Set Data && Trigger Generation
@@ -15,6 +16,7 @@ public class GridModule : MonoBehaviour
         gridSizeY = y;
         offset = os;
         isFirst = first;
+        Debug.Log(offset);
         Generate();
     }
 
@@ -27,9 +29,11 @@ public class GridModule : MonoBehaviour
             gridSizeX = 10;
             gridSizeY = 4;
             transform.localPosition = new Vector3(-5,1,0.7f);
+            PlayerController.instance.setCurrentModule(this);
         }
         else if(GridSystem.instance.activeModules.Count == 2 && isFirst){
             gridSizeX = 5;
+            offset = 3;
             transform.localPosition = new Vector3(-2,5,0.7f);
         }
         else{
@@ -41,14 +45,36 @@ public class GridModule : MonoBehaviour
                 0.7f);
         }
 
+        gridObjects = new GameObject[gridSizeY+ 1, gridSizeX + 1];
+        gridArrangement = new gridType[gridSizeY+ 1, gridSizeX + 1];
+
         for (int y = 0; y < gridSizeY; y++)
         {
             for (int x = 0; x < gridSizeX; x++)
             {
                 GameObject tmp = objectM.getGameObject();
+                gridObjects[y,x] = tmp;
+                gridArrangement[y,x] = gridType.floor;
                 tmp.transform.SetParent(this.transform);
-                tmp.transform.localPosition = new Vector3(x, y, -0.5f);
+                tmp.transform.localPosition = new Vector3(x, y, 0.2f);
             }
         }
+    }
+
+    public void retireModule(){
+        foreach (GameObject item in gridObjects)
+        {
+            ObjectManager.instance.retireObject(item);
+        }
+
+        Destroy(this.gameObject);
+    }
+
+    public int getGridSizeX(){
+        return gridSizeX;
+    }
+
+    public int getGridSizeY(){
+        return gridSizeY;
     }
 }

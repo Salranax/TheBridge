@@ -7,7 +7,7 @@ public class TickManager : MonoBehaviour
 {
     public static TickManager instance;
 
-    private float tickInterval = 0.35f;
+    private float tickInterval = 0.5f;
     public UnityEvent tick;
     public UnityEvent tickTimeChanged;
     

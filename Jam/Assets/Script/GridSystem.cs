@@ -14,6 +14,7 @@ public class GridSystem : MonoBehaviour
 
     //Generation System
     public List<GridModule> activeModules;
+    public int currentModuleIndex = 0;
     public GameObject cubePrefab;
     public GameObject scriptableModule;
 
@@ -109,8 +110,12 @@ public class GridSystem : MonoBehaviour
         // LevelGenerator.instance.spawnEnemies = new EnemyPatrolScript[2]{enemy1.GetComponent<EnemyPatrolScript>(), enemy2.GetComponent<EnemyPatrolScript>()};
         //TEST LEVEL CUSTOM END
 
-        generateNewPart(true);
-        generateNewPart(true);
+        generateNewPart(true);  //Starting platform 10,4
+        generateNewPart(true);  //First custom module min height 5 and offset to 0
+
+        PlayerController.instance.setPlayer(activeModules[currentModuleIndex]);
+
+        TickManager.instance.tick.AddListener(checkNewModuleNeed);
     }
 
     public void generateNewPart(bool first = false){
@@ -119,8 +124,8 @@ public class GridSystem : MonoBehaviour
         GridModule tmpModuleScript = tmpModule.GetComponent<GridModule>();
 
         activeModules.Add(tmpModuleScript);
-
-        tmpModuleScript.construct(Random.Range(2,5) , Random.Range(8,15), Random.Range(-2,2), first);
+        int os = Random.Range(-2,2); //Offset of module
+        tmpModuleScript.construct(Random.Range(3,6) , Random.Range(8,15), os, first);
     }
 
     public void whiten(int y)
@@ -143,6 +148,36 @@ public class GridSystem : MonoBehaviour
 
             }
         }
+    }
+
+    private void checkNewModuleNeed(){
+        if(activeModules.Count < 4){
+            generateNewPart();
+        }
+        //Destroy modules before last spawn point
+    }
+
+    public GridModule getNextModule(){
+        return activeModules[currentModuleIndex + 1];
+    }
+
+    public void moveToNextModule(){
+        currentModuleIndex ++;
+    }
+
+    public bool canPassToNext(GridModule cur, GridModule nxt, Vector2 cCoord){
+        int nextOffset = Mathf.Abs(nxt.offset);
+
+        if(cCoord.x - nextOffset < nxt.gridSizeX && cCoord.x - nextOffset > 0){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    public Vector2 positionOnNextGrid(GridModule cur, GridModule nxt, Vector2 cCoord){
+        return new Vector2(cCoord.x - nxt.offset, 0);
     }
 
 }
