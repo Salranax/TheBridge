@@ -166,9 +166,9 @@ public class GridSystem : MonoBehaviour
     }
 
     public bool canPassToNext(GridModule cur, GridModule nxt, Vector2 cCoord){
+        Debug.Log(nxt.offset + " / " + cCoord.x);
         int nextOffset = Mathf.Abs(nxt.offset);
-
-        if(cCoord.x - nextOffset < nxt.gridSizeX && cCoord.x - nextOffset > 0){
+        if(cCoord.x - nxt.offset < nxt.gridSizeX && cCoord.x - nxt.offset >= 0){
             return true;
         }
         else{
@@ -177,6 +177,7 @@ public class GridSystem : MonoBehaviour
     }
 
     public Vector2 positionOnNextGrid(GridModule cur, GridModule nxt, Vector2 cCoord){
+        Debug.Log(nxt.offset + " / " + cCoord.x);
         return new Vector2(cCoord.x - nxt.offset, 0);
     }
 

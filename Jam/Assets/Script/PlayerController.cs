@@ -95,9 +95,7 @@ public class PlayerController : MonoBehaviour
                 }
                 else{
                     gridType tmpType = currentModule.gridArrangement[gridY + 1, gridX];
-                    Debug.Log(tmpType);
                     if(tmpType == gridType.floor || tmpType == gridType.slot){
-                        Debug.Log("Move");
                         gridY += 1;
                         // if(LevelGenerator.instance.slots[LevelGenerator.instance.spotOrder].getCoord().y < gridY - 1  && !LevelGenerator.instance.isObjectiveComplete){
                         //     isTooMuch = true;
@@ -110,7 +108,6 @@ public class PlayerController : MonoBehaviour
                     }
                 }
 
-                Debug.Log(gridX + " / " + gridY);
             }
             // if(isSwiped){
             //     if(dir == SwipeDirection.Left){

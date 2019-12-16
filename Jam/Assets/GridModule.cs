@@ -16,7 +16,6 @@ public class GridModule : MonoBehaviour
         gridSizeY = y;
         offset = os;
         isFirst = first;
-        Debug.Log(offset);
         Generate();
     }
 
