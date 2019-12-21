@@ -74,6 +74,7 @@ public class PlayerController : MonoBehaviour
             }
             else{
                 if(currentModule.getGridSizeY() - 1 == gridY){
+                    Debug.Log("Next grid");
                     //Move to next Grid Module
                     GridModule tmpOld = currentModule;
                     currentModule = GridSystem.instance.getNextModule();
@@ -107,43 +108,7 @@ public class PlayerController : MonoBehaviour
                         // }
                     }
                 }
-
             }
-            // if(isSwiped){
-            //     if(dir == SwipeDirection.Left){
-            //         gridType tmpType = GridSystem.instance.grid[gridX - 1, gridY];
-            //         if(tmpType == gridType.floor || tmpType == gridType.slot){
-            //             gridX -= 1;
-            //             StartCoroutine(Rotate90(Vector3.up, new Vector3(gridX, gridY, -0.5f)));
-            //         }
-            //     }
-            //     else if(dir == SwipeDirection.Right){
-                    
-            //     gridType tmpType = GridSystem.instance.grid[gridX + 1, gridY];
-            //         if(tmpType == gridType.floor || tmpType == gridType.slot){
-            //             gridX += 1;
-            //             StartCoroutine(Rotate90(-Vector3.up, new Vector3(gridX, gridY, -0.5f)));
-            //         }
-
-            //     }
-            //     isSwiped = false;
-            // }
-            // else{
-            //     //Debug.Log(gridX + " " + gridY);
-            //     gridType tmpType = GridSystem.instance.grid[gridX , gridY + 1];
-            //     if(tmpType == gridType.floor || tmpType == gridType.slot){
-            //         gridY += 1;
-            //         if(LevelGenerator.instance.slots[LevelGenerator.instance.spotOrder].getCoord().y < gridY - 1  && !LevelGenerator.instance.isObjectiveComplete){
-            //             isTooMuch = true;
-            //             StartCoroutine("passedSlot");
-            //         }
-            //         StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
-            //         if((LevelGenerator.instance.spotOrder == 0 || (LevelGenerator.instance.spotOrder < LevelGenerator.instance.slots.Length && gridY > LevelGenerator.instance.slots[LevelGenerator.instance.spotOrder - 1].getCoord().y)) && !LevelGenerator.instance.isObjectiveComplete){
-            //             StartCoroutine("dimLight");
-            //         }
-            //     }
-
-            // }
         }
         else{
             resetPlayer();
@@ -184,31 +149,41 @@ public class PlayerController : MonoBehaviour
 
     public void resetPlayer(){
         if(resetTurn){
-            if(LevelGenerator.instance.spotOrder == 1){
-                transform.localPosition = new Vector3(startX, startY, -0.5f);
-                gridX = startX;
-                gridY = startY;
-            }
-            else{
-                Vector2 v = LevelGenerator.instance.getSpawnCoord();
-                transform.localPosition = new Vector3(v.x, v.y, -0.5f);
-                gridX = Mathf.FloorToInt(v.x);
-                gridY = Mathf.FloorToInt(v.y);
-                startX = gridX;
-                startY = gridY;
+            // if(LevelGenerator.instance.spotOrder == 1){
+            //     transform.localPosition = new Vector3(startX, startY, -0.5f);
+            //     gridX = startX;
+            //     gridY = startY;
+            // }
+            // else{
+            //     Vector2 v = LevelGenerator.instance.getSpawnCoord();
+            //     transform.localPosition = new Vector3(v.x, v.y, -0.5f);
+            //     gridX = Mathf.FloorToInt(v.x);
+            //     gridY = Mathf.FloorToInt(v.y);
+            //     startX = gridX;
+            //     startY = gridY;
 
-                LevelGenerator.instance.setEnemyPlayer();
-                LevelGenerator.instance.setNextSpawnPoint();
-            }
+            //     LevelGenerator.instance.setEnemyPlayer();
+            //     LevelGenerator.instance.setNextSpawnPoint();
+            // }
             GetComponent<Renderer>().material.SetColor("_EmissionColor", startEmissionColor);
             
         }
         else{
-            transform.localPosition = new Vector3(startX, startY, -0.5f);
-            gridX = startX;
-            gridY = startY;
+            // transform.localPosition = new Vector3(startX, startY, -0.5f);
+            // gridX = startX;
+            // gridY = startY;
         }
-        
+
+        currentModule = LevelGenerator.instance.getActiveSpawnPoint().spawnModule;
+        currentGridCoord = LevelGenerator.instance.getActiveSpawnPoint().spawnCoord;
+
+        transform.SetParent(currentModule.gameObject.transform);
+        transform.localPosition = currentGridCoord;
+
+        gridX = (int)currentGridCoord.x;
+        gridY = (int)currentGridCoord.y;
+
+        GridSystem.instance.setActivemodule(currentModule);
         transform.rotation = Quaternion.identity;
         resetTurn = false;
     }
@@ -227,7 +202,7 @@ public class PlayerController : MonoBehaviour
         transform.rotation = startOrientation * Quaternion.AngleAxis(90, axis);
         transform.localPosition = finalPos;
 
-        gridType tmpType = GridSystem.instance.grid[gridX , gridY];
+        gridType tmpType = currentModule.gridArrangement[gridY, gridX];
         if(tmpType == gridType.slot){
             float time = 0;
 
@@ -249,19 +224,19 @@ public class PlayerController : MonoBehaviour
             LevelGenerator.instance.increaseSpotOrder();
             //GridSystem.instance.whiten(gridY);
         }
-        if(LevelGenerator.instance.spotOrder == LevelGenerator.instance.slots.Length - 1 && LevelGenerator.instance.isObjectiveComplete){
-            // for (int i = 0; i < GridSystem.instance.cubeGrid.GetLength(0); i++)
-            // {
-            //     Cube tmpCube = GridSystem.instance.cubeGrid[i,gridY];
-            //     if(tmpCube != null){
-            //         tmpCube.setColor(Color.white);
-            //     }
-            // }
-            // if(gridY >= 22){
-            //     TickManager.instance.SetIsGameStarted(false);
-            //     UIManager.instance.win();
-            // }
-        }
+        // if(LevelGenerator.instance.spotOrder == LevelGenerator.instance.slots.Length - 1 && LevelGenerator.instance.isObjectiveComplete){
+        //     for (int i = 0; i < GridSystem.instance.cubeGrid.GetLength(0); i++)
+        //     {
+        //         Cube tmpCube = GridSystem.instance.cubeGrid[i,gridY];
+        //         if(tmpCube != null){
+        //             tmpCube.setColor(Color.white);
+        //         }
+        //     }
+        //     if(gridY >= 22){
+        //         TickManager.instance.SetIsGameStarted(false);
+        //         UIManager.instance.win();
+        //     }
+        // }
     }
 
     void OnTriggerEnter(Collider other)

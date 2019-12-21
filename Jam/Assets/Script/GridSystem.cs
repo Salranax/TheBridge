@@ -116,6 +116,8 @@ public class GridSystem : MonoBehaviour
         PlayerController.instance.setPlayer(activeModules[currentModuleIndex]);
 
         TickManager.instance.tick.AddListener(checkNewModuleNeed);
+
+        LevelGenerator.instance.setActiveSpawnPoint(activeModules[0], new Vector2(5, 3));
     }
 
     public void generateNewPart(bool first = false){
@@ -161,12 +163,15 @@ public class GridSystem : MonoBehaviour
         return activeModules[currentModuleIndex + 1];
     }
 
+    public void setActivemodule(GridModule gm){
+        currentModuleIndex = activeModules.IndexOf(gm);
+    }
+
     public void moveToNextModule(){
         currentModuleIndex ++;
     }
 
     public bool canPassToNext(GridModule cur, GridModule nxt, Vector2 cCoord){
-        Debug.Log(nxt.offset + " / " + cCoord.x);
         int nextOffset = Mathf.Abs(nxt.offset);
         if(cCoord.x - nxt.offset < nxt.gridSizeX && cCoord.x - nxt.offset >= 0){
             return true;

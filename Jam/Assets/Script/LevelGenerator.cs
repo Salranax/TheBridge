@@ -29,6 +29,7 @@ public class LevelGenerator : MonoBehaviour
     }
 
     private void Start() {
+
     }
 
     private void Awake() {
@@ -54,5 +55,13 @@ public class LevelGenerator : MonoBehaviour
 
     public void increaseSpotOrder(){
 
+    }
+
+    public void setActiveSpawnPoint(GridModule mod, Vector2 point){
+        activeSpawnPoint = new SpawnPoint(point, mod);
+    }
+
+    public SpawnPoint getActiveSpawnPoint(){
+        return activeSpawnPoint;
     }
 }

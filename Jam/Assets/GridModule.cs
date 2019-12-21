@@ -8,6 +8,7 @@ public class GridModule : MonoBehaviour
     public int offset;
     public gridType[,] gridArrangement;
     private GameObject[,] gridObjects;
+    private Slot[] slots;
     private bool isFirst;
 
     //Set Data && Trigger Generation
@@ -58,6 +59,23 @@ public class GridModule : MonoBehaviour
                 tmp.transform.localPosition = new Vector3(x, y, 0.2f);
             }
         }
+
+        if(GridSystem.instance.activeModules.Count != 1){
+            int rndSpot = Random.Range(1,4);
+            slots = new Slot[rndSpot];
+
+            for (int i = 0; i < rndSpot; i++)
+            {
+                GameObject tmp = Instantiate(Resources.Load("Slot")) as GameObject;
+                slots[i] = tmp.GetComponent<Slot>();
+                slots[i].setCoord(new Vector2(Random.Range(0,gridSizeX - 1), Random.Range(0,gridSizeY)));
+                gridArrangement[(int)slots[i].getCoord().y, (int)slots[i].getCoord().x] = gridType.slot;
+                gridObjects[(int)slots[i].getCoord().y, (int)slots[i].getCoord().x].SetActive(false);
+                tmp.transform.SetParent(this.transform);
+                tmp.transform.localPosition = slots[i].getCoord();
+            }
+        }
+
     }
 
     public void retireModule(){
