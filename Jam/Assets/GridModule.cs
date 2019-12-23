@@ -9,6 +9,7 @@ public class GridModule : MonoBehaviour
     public gridType[,] gridArrangement;
     private GameObject[,] gridObjects;
     private Slot[] slots;
+    private List<EnemyPatrolScript> enemies;
     private bool isFirst;
 
     //Set Data && Trigger Generation
@@ -61,7 +62,7 @@ public class GridModule : MonoBehaviour
         }
 
         if(GridSystem.instance.activeModules.Count != 1){
-            int rndSpot = Random.Range(1,4);
+            int rndSpot = Random.Range(1,3);
             slots = new Slot[rndSpot];
 
             for (int i = 0; i < rndSpot; i++)
@@ -74,6 +75,33 @@ public class GridModule : MonoBehaviour
                 tmp.transform.SetParent(this.transform);
                 tmp.transform.localPosition = slots[i].getCoord();
             }
+
+            int rndEnemy = Random.Range(0,100);
+
+            if(rndEnemy < 100){
+                GameObject enemy = Instantiate(Resources.Load("Enemy")) as GameObject;
+                //enemies.Add(enemy.GetComponent<EnemyPatrolScript>());
+                enemy.transform.SetParent(this.transform);
+                enemy.GetComponent<EnemyPatrolScript>().setCoord(Random.Range(0,gridSizeX - 1), Random.Range(0,gridSizeY), this);
+            }
+            // else if(rndEnemy > 50 && rndEnemy < 90){
+            //     for (int i = 0; i < 2; i++)
+            //     {
+            //         GameObject enemy = Instantiate(Resources.Load("Enemy")) as GameObject;
+            //         enemies.Add(enemy.GetComponent<EnemyPatrolScript>());
+            //         enemy.transform.SetParent(this.transform);
+            //         enemy.GetComponent<EnemyPatrolScript>().setCoord(Random.Range(0,gridSizeX - 1), Random.Range(0,gridSizeY), this);
+            //     }
+            // }
+            // else if(rndEnemy > 90){
+            //     for (int i = 0; i < 3; i++)
+            //     {
+            //         GameObject enemy = Instantiate(Resources.Load("Enemy")) as GameObject;
+            //         enemies.Add(enemy.GetComponent<EnemyPatrolScript>());
+            //         enemy.transform.SetParent(this.transform);
+            //         enemy.GetComponent<EnemyPatrolScript>().setCoord(Random.Range(0,gridSizeX - 1), Random.Range(0,gridSizeY), this);
+            //     }
+            // }
         }
 
     }
@@ -93,5 +121,12 @@ public class GridModule : MonoBehaviour
 
     public int getGridSizeY(){
         return gridSizeY;
+    }
+
+    public void convertSlotToFloor(int xC, int yC){
+        GameObject tmp = Instantiate(GridSystem.instance.cubePrefab);
+        tmp.transform.SetParent(transform);
+        tmp.transform.localPosition = new Vector3(xC, yC, 0.2f);
+        gridObjects[yC,xC] = tmp;
     }
 }

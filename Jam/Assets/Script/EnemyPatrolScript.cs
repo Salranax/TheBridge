@@ -4,16 +4,19 @@ using UnityEngine;
 
 public class EnemyPatrolScript : MonoBehaviour
 {
+    private enum DirAxis
+    {
+        x,
+        y
+    }
+
     public int gridX,gridY;
     private int dir = 1;
+    private DirAxis axis = DirAxis.x;
     private bool transforming = false;
     private float tickInterval;
     Quaternion startOrientation;
-
-    public void enemy(int gx, int gy){
-        gridX = gx;
-        gridY = gy;
-    }
+    private GridModule moduleOn;
 
     // Start is called before the first frame update
     void Start()
@@ -26,19 +29,31 @@ public class EnemyPatrolScript : MonoBehaviour
 
     public void moveEnemy(){
         if(!transforming){
-            if(dir > 0){
-                if(GridSystem.instance.grid[gridX + 1, gridY] != gridType.floor){
+            if(axis == DirAxis.x){
+                if(PlayerController.instance.getCurrentModule().getGridSizeX() - 1 == gridX || gridX + dir == -1){
                     dir *= -1;
                 }
+                gridX = gridX + dir;
             }
-            else if(dir < 0){
-                if(GridSystem.instance.grid[gridX - 1, gridY] != gridType.floor){
+            else if(axis == DirAxis.y){
+                if(PlayerController.instance.getCurrentModule().getGridSizeY() - 1 == gridY || gridY + dir == -1){
                     dir *= -1;
                 }
+                gridY = gridY + dir;
             }
-            
-            gridX = gridX + dir;
+
             StartCoroutine(Rotate90(dir == 1 ? -Vector3.up : Vector3.up , new Vector3(gridX, gridY, -0.5f)));
+
+            int redirectChance = Random.Range(0,100);
+
+            if(redirectChance >= 0 && redirectChance < 20){
+                if(axis == DirAxis.y){
+                    axis = DirAxis.x;
+                }
+                else{
+                    axis = DirAxis.y;
+                }
+            }
         }
     }
 
@@ -89,5 +104,12 @@ public class EnemyPatrolScript : MonoBehaviour
 
     private void intervalChange(){
         tickInterval = TickManager.instance.GetTickInterval();
+    }
+
+    public void setCoord(int x, int y, GridModule md){
+        moduleOn = md;
+        gridY = y;
+        gridX = x;
+        transform.localPosition = new Vector3(x,y,-0.5f);
     }
 }

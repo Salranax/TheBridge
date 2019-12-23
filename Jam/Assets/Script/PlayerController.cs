@@ -74,7 +74,6 @@ public class PlayerController : MonoBehaviour
             }
             else{
                 if(currentModule.getGridSizeY() - 1 == gridY){
-                    Debug.Log("Next grid");
                     //Move to next Grid Module
                     GridModule tmpOld = currentModule;
                     currentModule = GridSystem.instance.getNextModule();
@@ -213,12 +212,13 @@ public class PlayerController : MonoBehaviour
             }
 
             transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, 0.3f);
-            GameObject tmp = Instantiate(GridSystem.instance.cubePrefab);
-            tmp.transform.SetParent(GridSystem.instance.transform);
-            tmp.transform.position = new Vector3(transform.position.x, transform.position.y, 0);
+            // GameObject tmp = Instantiate(GridSystem.instance.cubePrefab);
+            // tmp.transform.SetParent(GridSystem.instance.transform);
+            // tmp.transform.position = new Vector3(transform.position.x, transform.position.y, 0);
             
-            GridSystem.instance.grid[gridX , gridY] = gridType.floor;
-            GridSystem.instance.cubeGrid[gridX, gridY] = tmp.GetComponent<Cube>();
+            currentModule.convertSlotToFloor(gridX, gridY);
+            currentModule.gridArrangement[gridY, gridX] = gridType.floor;
+
             resetTurn = true;
             
             LevelGenerator.instance.increaseSpotOrder();

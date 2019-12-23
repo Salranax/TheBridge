@@ -182,7 +182,6 @@ public class GridSystem : MonoBehaviour
     }
 
     public Vector2 positionOnNextGrid(GridModule cur, GridModule nxt, Vector2 cCoord){
-        Debug.Log(nxt.offset + " / " + cCoord.x);
         return new Vector2(cCoord.x - nxt.offset, 0);
     }
 
