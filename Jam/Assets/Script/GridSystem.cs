@@ -24,6 +24,7 @@ public class GridSystem : MonoBehaviour
 
     void Awake()
     {
+        
         if (instance == null)
         {
             instance = this;
@@ -160,7 +161,6 @@ public class GridSystem : MonoBehaviour
         if(activeModules.Count < 4){
             generateNewPart();
         }
-        Debug.Log(activeModules.Count);
         //Destroy modules before last spawn point
     }
 
@@ -168,26 +168,33 @@ public class GridSystem : MonoBehaviour
         return activeModules[currentModuleIndex + 1];
     }
 
+    public GridModule getNextModuleFall(){
+        return activeModules[currentModuleIndex + 2];
+    }
+
     public void setActivemodule(GridModule gm){
         currentModuleIndex = activeModules.IndexOf(gm);
     }
 
     public void moveToNextModule(){
-        //currentModuleIndex ++;
+        currentModuleIndex ++;
         if(currentModuleIndex + 3 >= activeModules.Count){
             generateNewPart();
         }
-        if(activeModules.Count > 4){
-            retireFirst();
-        }
+        // if(activeModules.Count > 4){
+        //     retireFirst();
+        // }
     }
 
     public bool canPassToNext(GridModule cur, GridModule nxt, Vector2 cCoord){
         int nextOffset = Mathf.Abs(nxt.offset);
+        Debug.Log(cCoord.x + " " + nxt.gridSizeX);
         if(cCoord.x - nxt.offset < nxt.gridSizeX && cCoord.x - nxt.offset >= 0){
+            Debug.Log("can pass to next");
             return true;
         }
         else{
+            Debug.Log("CANNOT");
             return false;
         }
     }

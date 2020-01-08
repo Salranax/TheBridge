@@ -10,7 +10,6 @@ public class PlayerController : MonoBehaviour
     private GridModule currentModule;
     private Vector2 currentGridCoord;
 
-
     Quaternion startOrientation;
     SwipeDirection dir;
 
@@ -52,10 +51,9 @@ public class PlayerController : MonoBehaviour
             if(isSwiped && dir != SwipeDirection.Down){
                 if(dir == SwipeDirection.Left){
                     if(gridX == 0){
-                        Debug.Log("Fall");
                         gridX--;
                         isFalling = true;
-                        StartCoroutine(Rotate90(-Vector3.up, new Vector3(gridX, gridY, -0.5f)));
+                        StartCoroutine(Rotate90(Vector3.up, new Vector3(gridX, gridY, -0.5f)));
                     }
                     else{
                         gridX--;
@@ -64,7 +62,6 @@ public class PlayerController : MonoBehaviour
                 }
                 else if(dir == SwipeDirection.Right){
                     if(currentModule.gridSizeX - 1 == gridX){
-                        Debug.Log("Fall");
                         gridX++;
                         isFalling = true;
                         StartCoroutine(Rotate90(-Vector3.up, new Vector3(gridX, gridY, -0.5f)));
@@ -83,20 +80,19 @@ public class PlayerController : MonoBehaviour
                     GridModule tmpOld = currentModule;
                     currentModule = GridSystem.instance.getNextModule();
                     GridSystem.instance.moveToNextModule();
-
-                    this.transform.SetParent(currentModule.gameObject.transform);
                     
                     if(GridSystem.instance.canPassToNext(tmpOld, currentModule, new Vector2(gridX, gridY))){
+                        this.transform.SetParent(currentModule.gameObject.transform);
+
                         Vector2 newGridCoord = GridSystem.instance.positionOnNextGrid(tmpOld, currentModule, new Vector2(gridX, gridY));
                         gridX = Mathf.FloorToInt(newGridCoord.x);
                         gridY = Mathf.FloorToInt(newGridCoord.y);
                         StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
                     }
                     else{
-                        Debug.Log("Fall");
-                        gridY++;
                         isFalling = true;
-                        StartCoroutine(Rotate90(-Vector3.up, new Vector3(gridX, gridY, -0.5f)));
+                        gridY++;
+                        StartCoroutine(Rotate90(-Vector3.right, new Vector3(gridX, gridY, -0.5f)));
                     }
                     
                 }
@@ -116,7 +112,7 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
-        else{
+        else if(!isFalling){
             resetPlayer();
         }
 
@@ -154,8 +150,6 @@ public class PlayerController : MonoBehaviour
     }
 
     public void resetPlayer(){
-        
-
         GetComponent<Renderer>().material.SetColor("_EmissionColor", startEmissionColor);
         currentModule = LevelGenerator.instance.getActiveSpawnPoint().spawnModule;
         currentGridCoord = LevelGenerator.instance.getActiveSpawnPoint().spawnCoord;
@@ -217,6 +211,7 @@ public class PlayerController : MonoBehaviour
         }
         else if(isFalling){
             GetComponent<Rigidbody>().isKinematic = false;
+            GetComponent<Rigidbody>().AddForce(new Vector3(0,0,500));
         }
     }
 
