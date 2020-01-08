@@ -9,7 +9,7 @@ public class GridModule : MonoBehaviour
     public gridType[,] gridArrangement;
     private GameObject[,] gridObjects;
     private Slot[] slots;
-    private List<EnemyPatrolScript> enemies;
+    private EnemyPatrolScript[] enemies;
     private bool isFirst;
 
     //Set Data && Trigger Generation
@@ -69,30 +69,32 @@ public class GridModule : MonoBehaviour
             {
                 GameObject tmp = Instantiate(Resources.Load("Slot")) as GameObject;
                 slots[i] = tmp.GetComponent<Slot>();
-                slots[i].setCoord(new Vector2(Random.Range(0,gridSizeX - 1), Random.Range(0,gridSizeY)));
+                slots[i].setCoord(new Vector2(Random.Range(0,gridSizeX - 1), Random.Range(0,gridSizeY)), this);
                 gridArrangement[(int)slots[i].getCoord().y, (int)slots[i].getCoord().x] = gridType.slot;
                 gridObjects[(int)slots[i].getCoord().y, (int)slots[i].getCoord().x].SetActive(false);
                 tmp.transform.SetParent(this.transform);
                 tmp.transform.localPosition = slots[i].getCoord();
             }
 
-            int rndEnemy = Random.Range(0,100);
+            int rndEnemy = Random.Range(40,100);
 
-            if(rndEnemy < 100){
+            if(rndEnemy <= 50){
                 GameObject enemy = Instantiate(Resources.Load("Enemy")) as GameObject;
-                //enemies.Add(enemy.GetComponent<EnemyPatrolScript>());
+                enemies = new EnemyPatrolScript[1];
+                enemies[0] = enemy.GetComponent<EnemyPatrolScript>();
                 enemy.transform.SetParent(this.transform);
                 enemy.GetComponent<EnemyPatrolScript>().setCoord(Random.Range(0,gridSizeX - 1), Random.Range(0,gridSizeY), this);
             }
-            // else if(rndEnemy > 50 && rndEnemy < 90){
-            //     for (int i = 0; i < 2; i++)
-            //     {
-            //         GameObject enemy = Instantiate(Resources.Load("Enemy")) as GameObject;
-            //         enemies.Add(enemy.GetComponent<EnemyPatrolScript>());
-            //         enemy.transform.SetParent(this.transform);
-            //         enemy.GetComponent<EnemyPatrolScript>().setCoord(Random.Range(0,gridSizeX - 1), Random.Range(0,gridSizeY), this);
-            //     }
-            // }
+            else if(rndEnemy > 50 && rndEnemy <= 100){
+                enemies = new EnemyPatrolScript[2];
+                for (int i = 0; i < 2; i++)
+                {
+                    GameObject enemy = Instantiate(Resources.Load("Enemy")) as GameObject;
+                    enemies[i] = enemy.GetComponent<EnemyPatrolScript>();
+                    enemy.transform.SetParent(this.transform);
+                    enemy.GetComponent<EnemyPatrolScript>().setCoord(Random.Range(0,gridSizeX - 1), Random.Range(0,gridSizeY), this);
+                }
+            }
             // else if(rndEnemy > 90){
             //     for (int i = 0; i < 3; i++)
             //     {
@@ -109,7 +111,9 @@ public class GridModule : MonoBehaviour
     public void retireModule(){
         foreach (GameObject item in gridObjects)
         {
-            ObjectManager.instance.retireObject(item);
+            if(item != null){
+                ObjectManager.instance.retireObject(item);
+            }
         }
 
         Destroy(this.gameObject);

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class GridSystem : MonoBehaviour
 {
@@ -17,6 +18,9 @@ public class GridSystem : MonoBehaviour
     public int currentModuleIndex = 0;
     public GameObject cubePrefab;
     public GameObject scriptableModule;
+    public GameObject spotEffect;
+
+    public UnityEvent moduleDestroy;
 
     void Awake()
     {
@@ -156,6 +160,7 @@ public class GridSystem : MonoBehaviour
         if(activeModules.Count < 4){
             generateNewPart();
         }
+        Debug.Log(activeModules.Count);
         //Destroy modules before last spawn point
     }
 
@@ -168,7 +173,13 @@ public class GridSystem : MonoBehaviour
     }
 
     public void moveToNextModule(){
-        currentModuleIndex ++;
+        //currentModuleIndex ++;
+        if(currentModuleIndex + 3 >= activeModules.Count){
+            generateNewPart();
+        }
+        if(activeModules.Count > 4){
+            retireFirst();
+        }
     }
 
     public bool canPassToNext(GridModule cur, GridModule nxt, Vector2 cCoord){
@@ -183,6 +194,12 @@ public class GridSystem : MonoBehaviour
 
     public Vector2 positionOnNextGrid(GridModule cur, GridModule nxt, Vector2 cCoord){
         return new Vector2(cCoord.x - nxt.offset, 0);
+    }
+
+    public void retireFirst(){
+        activeModules[0].retireModule();
+        currentModuleIndex --;
+        activeModules.RemoveAt(0);
     }
 
 }

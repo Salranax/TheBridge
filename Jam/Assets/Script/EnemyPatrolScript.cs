@@ -12,7 +12,7 @@ public class EnemyPatrolScript : MonoBehaviour
 
     public int gridX,gridY;
     private int dir = 1;
-    private DirAxis axis = DirAxis.x;
+    private DirAxis axis = DirAxis.y;
     private bool transforming = false;
     private float tickInterval;
     Quaternion startOrientation;
@@ -29,30 +29,35 @@ public class EnemyPatrolScript : MonoBehaviour
 
     public void moveEnemy(){
         if(!transforming){
+                int redirectChance = Random.Range(0,100);
+
+                if(redirectChance >= 0 && redirectChance < 20){
+                    if(axis == DirAxis.y){
+                        axis = DirAxis.x;
+                    }
+                    else{
+                        axis = DirAxis.y;
+                    }
+                    dir = 1;
+                }
             if(axis == DirAxis.x){
-                if(PlayerController.instance.getCurrentModule().getGridSizeX() - 1 == gridX || gridX + dir == -1){
+                if(moduleOn.getGridSizeX() - 1 == gridX || gridX + dir == -1){
                     dir *= -1;
                 }
                 gridX = gridX + dir;
             }
             else if(axis == DirAxis.y){
-                if(PlayerController.instance.getCurrentModule().getGridSizeY() - 1 == gridY || gridY + dir == -1){
+                if(moduleOn.getGridSizeY() - 1 == gridY || gridY + dir == -1){
                     dir *= -1;
                 }
                 gridY = gridY + dir;
             }
 
-            StartCoroutine(Rotate90(dir == 1 ? -Vector3.up : Vector3.up , new Vector3(gridX, gridY, -0.5f)));
-
-            int redirectChance = Random.Range(0,100);
-
-            if(redirectChance >= 0 && redirectChance < 20){
-                if(axis == DirAxis.y){
-                    axis = DirAxis.x;
-                }
-                else{
-                    axis = DirAxis.y;
-                }
+            if(axis == DirAxis.x){
+                StartCoroutine(Rotate90(dir == 1 ? -Vector3.up : Vector3.up , new Vector3(gridX, gridY, -0.5f)));
+            }
+            else if(axis == DirAxis.y){
+                StartCoroutine(Rotate90(dir == 1 ? -Vector3.left : Vector3.left , new Vector3(gridX, gridY, -0.5f)));
             }
         }
     }

@@ -29,8 +29,9 @@ public class ObjectManager : MonoBehaviour
     }
 
     public void retireObject(GameObject obj){
-        obj.SetActive(false);
-        idleObjects.Add(obj);
-        Debug.Log("Retired");
+        if(obj.tag == "cube"){
+            obj.SetActive(false);
+            idleObjects.Add(obj);
+        }
     }
 }
