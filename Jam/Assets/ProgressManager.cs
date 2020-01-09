@@ -4,9 +4,11 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class ProgressManager : MonoBehaviour
-{
+{   
+    public static ProgressManager instance;
     public Slider progressSlider;
     public Image iconImage;
+    public Image progressIndication;
 
     private int progressStartPoint;
 
@@ -14,8 +16,14 @@ public class ProgressManager : MonoBehaviour
 
     private List<string> names = new List<string>(){"empty","fire", "glass","paper","balloon","windmills"} ;
     private List<int> check = new List<int>(){0 ,10, 20, 40, 80, 160  };
-    
-    // Start is called before the first frame update
+
+    void Awake()
+    {
+        if(instance == null){
+            instance = this;
+        }
+    } 
+
     void Start()
     {
         PlayerPrefs.DeleteAll();
@@ -32,8 +40,6 @@ public class ProgressManager : MonoBehaviour
             progressSlider.maxValue = check[names.IndexOf(lastProgress) + 1];
 
         }
-        Debug.Log(lastProgress);
-
     }
 
     // Update is called once per frame
@@ -50,8 +56,11 @@ public class ProgressManager : MonoBehaviour
                 progressSlider.value = 0;
                 progressSlider.maxValue = check[names.IndexOf(lastProgress) + 1];
                 PlayerPrefs.SetString("Progress",lastProgress);
+
+                progressIndication.sprite = iconImage.sprite;
+                progressIndication.GetComponent<Animation>().Play();
+
                 lastProgress = names[names.IndexOf(lastProgress) + 1];
-                Debug.Log(lastProgress);
                 iconImage.sprite = Resources.Load(lastProgress, typeof(Sprite)) as Sprite;
             } 
         }

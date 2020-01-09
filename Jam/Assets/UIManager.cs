@@ -7,6 +7,7 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager instance;
     public GameObject winScreen;
+    public GameObject failScreen;
 
     // Start is called before the first frame update
     void Awake()
@@ -18,6 +19,10 @@ public class UIManager : MonoBehaviour
 
     public void win(){
         winScreen.SetActive(true);
+    }
+
+    public void fail(){
+        failScreen.SetActive(true);
     }
 
     public void restart(){

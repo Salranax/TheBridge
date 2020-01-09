@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -20,6 +21,8 @@ public class PlayerController : MonoBehaviour
     private int startX = 5, startY = 3;
     private float tickInterval;
     public Color startEmissionColor;
+
+    private float timer = 0;
 
     void Awake() {
         if(instance == null){
@@ -44,6 +47,22 @@ public class PlayerController : MonoBehaviour
         gridY = 3;
         gridX = 5;
         transform.localPosition = new Vector3(5, 3, -0.5f);
+    }
+
+    void Update()
+    {
+        if(isFalling && transform.position.z > 10f){
+            GetComponent<Rigidbody>().velocity = Vector3.zero;
+            TickManager.instance.SetIsGameStarted(false);
+            isFalling = false;
+        }
+        else if(!isFalling && transform.position.z > 10f){
+            timer += Time.deltaTime;
+            UIManager.instance.fail();
+            if(timer > 2f){
+                SceneManager.LoadSceneAsync(0);
+            }
+        }
     }
 
     public void movePlayer(){
@@ -112,8 +131,8 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
-        else if(!isFalling){
-            resetPlayer();
+        else if(resetTurn){
+            //resetPlayer();
         }
 
     }
@@ -165,6 +184,37 @@ public class PlayerController : MonoBehaviour
         resetTurn = false;
     }
 
+    public IEnumerator slotReset(){
+        transform.localScale = new Vector3(0, 0, 0);
+
+        transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, -0.5f);
+
+        float amount = 0;
+
+        while (amount < tickInterval / 2) {
+            amount += Time.deltaTime;
+            transform.localScale = Vector3.Lerp(new Vector3(0, 0, 0), new Vector3(1, 1, 1), amount / tickInterval * 2);
+            yield return new WaitForEndOfFrame();
+        }
+
+        // Vector3 currentPos = transform.localPosition;
+        // transform.localPosition = new Vector3(currentPos.x, currentPos.y, -8);
+        
+        // Vector3 finalPos = new Vector3(currentPos.x, currentPos.y, -0.5f);
+
+        // float amount = 0;
+
+        // while (amount < tickInterval / 2) {
+        //     amount += Time.deltaTime;
+        //     transform.localPosition = Vector3.Lerp(transform.localPosition, finalPos, amount / tickInterval * 2 / 3);
+        //     yield return new WaitForEndOfFrame();
+        // }
+
+        resetTurn = false;
+        
+        yield return new WaitForEndOfFrame();
+    }
+
     private IEnumerator Rotate90(Vector3 axis, Vector3 finalPos) {
         startOrientation = transform.rotation;
         axis = transform.InverseTransformDirection(axis);
@@ -185,16 +235,16 @@ public class PlayerController : MonoBehaviour
                 float time = 0;
 
                 GameObject tmp = Instantiate(GridSystem.instance.spotEffect) as GameObject;
-                tmp.transform.position = new Vector3(transform.position.x, transform.position.y, 0.5f);
+                //tmp.transform.position = new Vector3(transform.position.x, transform.position.y, 0.5f);
 
                 while(time < tickInterval / 5){
-                    transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(transform.localPosition.x, transform.localPosition.y, 0.3f), time / tickInterval * 5);
+                    transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(transform.localPosition.x, transform.localPosition.y, 0.5f), time / tickInterval * 5);
                     time += Time.deltaTime;
                     yield return new WaitForEndOfFrame();
                 }
 
                 //resetPlayer();
-                transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, 0.3f);
+                //transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, 0.5f);
                 // GameObject tmp = Instantiate(GridSystem.instance.cubePrefab);
                 // tmp.transform.SetParent(GridSystem.instance.transform);
                 // tmp.transform.position = new Vector3(transform.position.x, transform.position.y, 0);
@@ -206,6 +256,8 @@ public class PlayerController : MonoBehaviour
                 resetTurn = true;
                 
                 LevelGenerator.instance.increaseSpotOrder();
+
+                StartCoroutine("slotReset");
                 //GridSystem.instance.whiten(gridY);
             }
         }
@@ -213,11 +265,13 @@ public class PlayerController : MonoBehaviour
             GetComponent<Rigidbody>().isKinematic = false;
             GetComponent<Rigidbody>().AddForce(new Vector3(0,0,500));
         }
+
+        yield return new WaitForEndOfFrame();
     }
 
     void OnTriggerEnter(Collider other)
     {
-        if(other.tag == "Enemy"){
+        if(other.tag == "Enemy" && !isFalling && !resetTurn){
             StopAllCoroutines();
             StartCoroutine("enemyHitAnim");
         }
@@ -239,6 +293,8 @@ public class PlayerController : MonoBehaviour
 
         resetPlayer();
 
+        resetTurn = true;
+
         while(t < tickInterval){
             transform.localScale = Vector3.Lerp(new Vector3(0,0,0), new Vector3(1,1,1),t / tickInterval * 2);
             tmpMat.SetColor("_EmissionColor", Color.Lerp(Color.black, startEmissionColor, t / tickInterval));
@@ -249,6 +305,8 @@ public class PlayerController : MonoBehaviour
 
         tmpMat.SetColor("_EmissionColor", startEmissionColor);
         tmpMat.color = Color.white;
+
+        resetTurn = false;
 
         yield return new WaitForEndOfFrame();
     }

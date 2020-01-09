@@ -40,10 +40,13 @@ public class CameraManager : MonoBehaviour
         float t = 0;
         Vector3 axis = transform.InverseTransformDirection(Vector3.left);
         Color camStartC = cam.backgroundColor;
+        GameObject slider = ProgressManager.instance.progressSlider.gameObject;
+        Vector3 sliderStart = slider.transform.position;
 
         while(t < 1){
             t += Time.deltaTime;
             transform.eulerAngles = new Vector3(transform.localRotation.eulerAngles.x, Mathf.Lerp(90,0,t), 0);
+            slider.transform.position = Vector3.Lerp(sliderStart, new Vector3(950, sliderStart.y, sliderStart.z), t);
             cam.backgroundColor = Color.Lerp(camStartC, Color.black, t);
             yield return new WaitForEndOfFrame();
         }

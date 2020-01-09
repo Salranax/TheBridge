@@ -188,13 +188,10 @@ public class GridSystem : MonoBehaviour
 
     public bool canPassToNext(GridModule cur, GridModule nxt, Vector2 cCoord){
         int nextOffset = Mathf.Abs(nxt.offset);
-        Debug.Log(cCoord.x + " " + nxt.gridSizeX);
         if(cCoord.x - nxt.offset < nxt.gridSizeX && cCoord.x - nxt.offset >= 0){
-            Debug.Log("can pass to next");
             return true;
         }
         else{
-            Debug.Log("CANNOT");
             return false;
         }
     }
