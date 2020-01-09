@@ -37,6 +37,7 @@ public class ProgressManager : MonoBehaviour
         }
         else
         {
+            lastProgress = "empty";
             progressSlider.maxValue = check[names.IndexOf(lastProgress) + 1];
 
         }
@@ -59,8 +60,15 @@ public class ProgressManager : MonoBehaviour
 
                 progressIndication.sprite = iconImage.sprite;
                 progressIndication.GetComponent<Animation>().Play();
-
-                lastProgress = names[names.IndexOf(lastProgress) + 1];
+                if (lastProgress == "empty")
+                {
+                    lastProgress = names[names.IndexOf(lastProgress) + 2];
+                }
+                else
+                {
+                    lastProgress = names[names.IndexOf(lastProgress) + 1];
+                }
+                
                 iconImage.sprite = Resources.Load(lastProgress, typeof(Sprite)) as Sprite;
             } 
         }
