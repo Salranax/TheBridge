@@ -235,7 +235,7 @@ public class PlayerController : MonoBehaviour
                 float time = 0;
 
                 GameObject tmp = Instantiate(GridSystem.instance.spotEffect) as GameObject;
-                //tmp.transform.position = new Vector3(transform.position.x, transform.position.y, 0.5f);
+                tmp.transform.position = new Vector3(transform.position.x, transform.position.y, 0.5f);
 
                 while(time < tickInterval / 5){
                     transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(transform.localPosition.x, transform.localPosition.y, 0.5f), time / tickInterval * 5);
