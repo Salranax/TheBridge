@@ -1,17 +1,15 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEditor;
 
-public class LevelEditor : MonoBehaviour
+public class LevelEditor : EditorWindow
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+
+    [MenuItem("Window/Level Editor")]
+    public static void ShowWindow(){
+        GetWindow<LevelEditor>("LevelEditor");
     }
 
-    // Update is called once per frame
-    void Update()
+    void OnGUI()
     {
         
     }

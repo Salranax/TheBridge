@@ -232,6 +232,8 @@ public class PlayerController : MonoBehaviour
         if(!isFalling){
             gridType tmpType = currentModule.gridArrangement[gridY, gridX];
             if(tmpType == gridType.slot){
+                ProgressManager.instance.increaseSlotScore();
+
                 float time = 0;
 
                 GameObject tmp = Instantiate(GridSystem.instance.spotEffect) as GameObject;
