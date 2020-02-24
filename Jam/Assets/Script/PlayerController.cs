@@ -8,7 +8,6 @@ public class PlayerController : MonoBehaviour
     public static PlayerController instance;
     
     public int gridX, gridY;
-    private GridModule currentModule;
     private Vector2 currentGridCoord;
 
     Quaternion startOrientation;
@@ -42,13 +41,6 @@ public class PlayerController : MonoBehaviour
         startEmissionColor = GetComponent<Renderer>().material.GetColor("_EmissionColor");
     }
 
-    public void setPlayer(GridModule module){
-        this.transform.SetParent(module.gameObject.transform);
-        gridY = 3;
-        gridX = 5;
-        transform.localPosition = new Vector3(5, 3, -0.5f);
-    }
-
     void Update()
     {
         if(isFalling && transform.position.z > 10f){
@@ -80,55 +72,13 @@ public class PlayerController : MonoBehaviour
                     }
                 }
                 else if(dir == SwipeDirection.Right){
-                    if(currentModule.gridSizeX - 1 == gridX){
-                        gridX++;
-                        isFalling = true;
-                        StartCoroutine(Rotate90(-Vector3.up, new Vector3(gridX, gridY, -0.5f)));
-                    }
-                    else{
-                        gridX++;
-                        StartCoroutine(Rotate90(-Vector3.up, new Vector3(gridX, gridY, -0.5f)));
-                    }
+
                 }
 
                 isSwiped = false;
             }
             else{
-                if(currentModule.getGridSizeY() - 1 == gridY){
-                    //Move to next Grid Module
-                    GridModule tmpOld = currentModule;
-                    currentModule = GridSystem.instance.getNextModule();
-                    GridSystem.instance.moveToNextModule();
-                    
-                    if(GridSystem.instance.canPassToNext(tmpOld, currentModule, new Vector2(gridX, gridY))){
-                        this.transform.SetParent(currentModule.gameObject.transform);
 
-                        Vector2 newGridCoord = GridSystem.instance.positionOnNextGrid(tmpOld, currentModule, new Vector2(gridX, gridY));
-                        gridX = Mathf.FloorToInt(newGridCoord.x);
-                        gridY = Mathf.FloorToInt(newGridCoord.y);
-                        StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
-                    }
-                    else{
-                        isFalling = true;
-                        gridY++;
-                        StartCoroutine(Rotate90(-Vector3.right, new Vector3(gridX, gridY, -0.5f)));
-                    }
-                    
-                }
-                else{
-                    gridType tmpType = currentModule.gridArrangement[gridY + 1, gridX];
-                    if(tmpType == gridType.floor || tmpType == gridType.slot){
-                        gridY += 1;
-                        // if(LevelGenerator.instance.slots[LevelGenerator.instance.spotOrder].getCoord().y < gridY - 1  && !LevelGenerator.instance.isObjectiveComplete){
-                        //     isTooMuch = true;
-                        //     StartCoroutine("passedSlot");
-                        // }
-                        StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
-                        // if((LevelGenerator.instance.spotOrder == 0 || (LevelGenerator.instance.spotOrder < LevelGenerator.instance.slots.Length && gridY > LevelGenerator.instance.slots[LevelGenerator.instance.spotOrder - 1].getCoord().y)) && !LevelGenerator.instance.isObjectiveComplete){
-                        //     StartCoroutine("dimLight");
-                        // }
-                    }
-                }
             }
         }
         else if(resetTurn){
@@ -169,19 +119,7 @@ public class PlayerController : MonoBehaviour
     }
 
     public void resetPlayer(){
-        GetComponent<Renderer>().material.SetColor("_EmissionColor", startEmissionColor);
-        currentModule = LevelGenerator.instance.getActiveSpawnPoint().spawnModule;
-        currentGridCoord = LevelGenerator.instance.getActiveSpawnPoint().spawnCoord;
 
-        transform.SetParent(currentModule.gameObject.transform);
-        transform.localPosition = currentGridCoord;
-
-        gridX = (int)currentGridCoord.x;
-        gridY = (int)currentGridCoord.y;
-
-        GridSystem.instance.setActivemodule(currentModule);
-        transform.rotation = Quaternion.identity;
-        resetTurn = false;
     }
 
     public IEnumerator slotReset(){
@@ -230,38 +168,7 @@ public class PlayerController : MonoBehaviour
         transform.localPosition = finalPos;
 
         if(!isFalling){
-            gridType tmpType = currentModule.gridArrangement[gridY, gridX];
-            if(tmpType == gridType.slot){
-                ProgressManager.instance.increaseSlotScore();
 
-                float time = 0;
-
-                GameObject tmp = Instantiate(GridSystem.instance.spotEffect) as GameObject;
-                tmp.transform.position = new Vector3(transform.position.x, transform.position.y, 0.5f);
-
-                while(time < tickInterval / 5){
-                    transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(transform.localPosition.x, transform.localPosition.y, 0.5f), time / tickInterval * 5);
-                    time += Time.deltaTime;
-                    yield return new WaitForEndOfFrame();
-                }
-
-                //resetPlayer();
-                //transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, 0.5f);
-                // GameObject tmp = Instantiate(GridSystem.instance.cubePrefab);
-                // tmp.transform.SetParent(GridSystem.instance.transform);
-                // tmp.transform.position = new Vector3(transform.position.x, transform.position.y, 0);
-                
-                currentModule.convertSlotToFloor(gridX, gridY);
-                currentModule.gridArrangement[gridY, gridX] = gridType.floor;
-                LevelGenerator.instance.setActiveSpawnPoint(currentModule, new Vector2(gridX,gridY));
-
-                resetTurn = true;
-                
-                LevelGenerator.instance.increaseSpotOrder();
-
-                StartCoroutine("slotReset");
-                //GridSystem.instance.whiten(gridY);
-            }
         }
         else if(isFalling){
             GetComponent<Rigidbody>().isKinematic = false;
@@ -347,13 +254,5 @@ public class PlayerController : MonoBehaviour
 
     private void intervalChanged(){
         tickInterval = TickManager.instance.GetTickInterval();
-    }
-
-    public void setCurrentModule(GridModule gm){
-        currentModule = gm;
-    }
-
-    public GridModule getCurrentModule(){
-        return currentModule;
     }
 }

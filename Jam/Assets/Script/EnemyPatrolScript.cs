@@ -16,7 +16,6 @@ public class EnemyPatrolScript : MonoBehaviour
     private bool transforming = false;
     private float tickInterval;
     Quaternion startOrientation;
-    private GridModule moduleOn;
 
     // Start is called before the first frame update
     void Start()
@@ -41,16 +40,10 @@ public class EnemyPatrolScript : MonoBehaviour
                     dir = 1;
                 }
             if(axis == DirAxis.x){
-                if(moduleOn.getGridSizeX() - 1 == gridX || gridX + dir == -1){
-                    dir *= -1;
-                }
-                gridX = gridX + dir;
+
             }
             else if(axis == DirAxis.y){
-                if(moduleOn.getGridSizeY() - 1 == gridY || gridY + dir == -1){
-                    dir *= -1;
-                }
-                gridY = gridY + dir;
+
             }
 
             if(axis == DirAxis.x){
@@ -109,12 +102,5 @@ public class EnemyPatrolScript : MonoBehaviour
 
     private void intervalChange(){
         tickInterval = TickManager.instance.GetTickInterval();
-    }
-
-    public void setCoord(int x, int y, GridModule md){
-        moduleOn = md;
-        gridY = y;
-        gridX = x;
-        transform.localPosition = new Vector3(x,y,-0.5f);
     }
 }

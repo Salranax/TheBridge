@@ -14,13 +14,4 @@ public class Test : MonoBehaviour
         ObjectManager.instance.retireObject(tmp);
         tmp = null;
     }
-
-    public void generateGridModule(){
-        if(GridSystem.instance.activeModules.Count == 0){
-            GridSystem.instance.generateNewPart(true);
-        }
-        else{
-            GridSystem.instance.generateNewPart();
-        }
-    }
 }

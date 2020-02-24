@@ -9,11 +9,9 @@ public class LevelGenerator : MonoBehaviour
     public struct SpawnPoint
     {
         public Vector2 spawnCoord;
-        public GridModule spawnModule;
 
-        public SpawnPoint(Vector2 coord, GridModule md){
+        public SpawnPoint(Vector2 coord){
             spawnCoord = coord;
-            spawnModule = md;
         }
     }
 
@@ -55,10 +53,6 @@ public class LevelGenerator : MonoBehaviour
 
     public void increaseSpotOrder(){
 
-    }
-
-    public void setActiveSpawnPoint(GridModule mod, Vector2 point){
-        activeSpawnPoint = new SpawnPoint(point, mod);
     }
 
     public SpawnPoint getActiveSpawnPoint(){
