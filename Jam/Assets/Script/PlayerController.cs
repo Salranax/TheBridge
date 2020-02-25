@@ -23,6 +23,10 @@ public class PlayerController : MonoBehaviour
 
     private float timer = 0;
 
+    public void setPlayerPoint(Vector2 _pos){
+        transform.localPosition = new Vector3(_pos.x, _pos.y, -0.7f);
+    }
+
     void Awake() {
         if(instance == null){
             instance = this;
@@ -31,7 +35,6 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
         TickManager.instance.tick.AddListener(movePlayer);
         TickManager.instance.tickTimeChanged.AddListener(intervalChanged);
 

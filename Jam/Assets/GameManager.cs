@@ -1,10 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cinemachine;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+
+    [Header("Controller Scripts")]
+    public PlayerController _PlayerController;
+    public GridSystem _GridSystem;
+    [Header("----------------------")]
+    public CinemachineVirtualCamera playerCam;
     private string LevelPrefName = "LevelProgress";
     private string UnlockPrefNsame = "LastUnlocked";
 
@@ -28,6 +35,7 @@ public class GameManager : MonoBehaviour
     }
 
     public void startLevel(){
+        playerCam.Priority = 11;
         int[] lvl = formatGetter(getLevel());
         setLevelData(lvl[0], lvl[1]);
     }

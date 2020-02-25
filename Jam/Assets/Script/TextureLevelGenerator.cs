@@ -2,10 +2,32 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//Color Palete
+//Color(150,150,150,255) Ground
+//Color(255,0,0,255) Spawn Point
+//Color(0,0,0,255) Enemy
+//
+
 public class TextureLevelGenerator : MonoBehaviour
 {   
+    public GameManager _GameManager;
     public Texture2D map;
     public ColorToPrefab[] colorMappings;
+
+    public struct SpawnPoint
+    {
+        public Vector2 spawnCoord;
+
+        public SpawnPoint(Vector2 coord){
+            spawnCoord = coord;
+        }
+    }
+
+    private SpawnPoint activeSpawnPoint;
+
+    public SpawnPoint getActiveSpawnPoint(){
+        return activeSpawnPoint;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -13,6 +35,7 @@ public class TextureLevelGenerator : MonoBehaviour
         GenerateLevel();
     }
 
+    //Get over every pixel
     void GenerateLevel(){
         for (int x = 0; x < map.width; x++)
         {
@@ -24,20 +47,43 @@ public class TextureLevelGenerator : MonoBehaviour
         }
     }
 
+    //Generate map from Pixels
+    //Pixel List:
+    // 0: Ground
+    // 1: Spawn Point
+    // 2: Enemy
+    //
     void GenerateTile(int x, int y){
         Color pixelColor = map.GetPixel(x,y);
-
         if(pixelColor.a == 0){
             //Ignore if pixel is transparent
             return;
         }
 
-        foreach (ColorToPrefab item in colorMappings)
-        {
-            if(item.color.Equals(pixelColor)){
-                Vector2 position = new Vector2(x, y);
-                //Instantiate(item.prefab, position, Quaternion.identity, );
-            }
+        if(colorMappings[0].color.Equals(pixelColor)){
+            Vector2 position = new Vector2(x, y);
+            GameObject _tmpGrid = Instantiate(colorMappings[0].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
+            _tmpGrid.transform.localPosition = new Vector2(x, y);  
         }
+        else if(colorMappings[1].color.Equals(pixelColor)){
+            activeSpawnPoint = new SpawnPoint(new Vector2(x, y));
+
+            Vector2 position = new Vector2(x, y);
+            GameObject _tmpGrid = Instantiate(colorMappings[0].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
+            _tmpGrid.transform.localPosition = new Vector2(x, y);  
+        }
+        else if(colorMappings[2].color.Equals(pixelColor)){
+            
+        }
+
+        // foreach (ColorToPrefab item in colorMappings)
+        // {
+        //     if(item.color.Equals(pixelColor)){
+        //         Debug.Log("hops");
+        //         Vector2 position = new Vector2(x, y);
+        //         GameObject _tmpGrid = Instantiate(item.prefab, position, Quaternion.identity, _gridSystem.transform);
+        //         _tmpGrid.transform.localPosition = new Vector2(x, y);
+        //     }
+        // }
     }
 }
