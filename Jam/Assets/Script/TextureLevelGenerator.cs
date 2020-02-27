@@ -37,6 +37,9 @@ public class TextureLevelGenerator : MonoBehaviour
 
     //Get over every pixel
     void GenerateLevel(){
+
+        _GameManager._GridSystem.generateGrid(map.width, map.height);
+
         for (int x = 0; x < map.width; x++)
         {
             for (int y = 0; y < map.height; y++)
@@ -55,19 +58,24 @@ public class TextureLevelGenerator : MonoBehaviour
     //
     void GenerateTile(int x, int y){
         Color pixelColor = map.GetPixel(x,y);
+
         if(pixelColor.a == 0){
             //Ignore if pixel is transparent
             return;
         }
 
         if(colorMappings[0].color.Equals(pixelColor)){
+            _GameManager._GridSystem.addToGrid(gridType.floor, x, y);
+
             Vector2 position = new Vector2(x, y);
             GameObject _tmpGrid = Instantiate(colorMappings[0].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
             _tmpGrid.transform.localPosition = new Vector2(x, y);  
         }
         else if(colorMappings[1].color.Equals(pixelColor)){
-            activeSpawnPoint = new SpawnPoint(new Vector2(x, y));
+            _GameManager._GridSystem.addToGrid(gridType.floor, x, y);
 
+            activeSpawnPoint = new SpawnPoint(new Vector2(x, y));
+            _GameManager._PlayerController.setPlayerPoint(new Vector2(x, y));
             Vector2 position = new Vector2(x, y);
             GameObject _tmpGrid = Instantiate(colorMappings[0].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
             _tmpGrid.transform.localPosition = new Vector2(x, y);  

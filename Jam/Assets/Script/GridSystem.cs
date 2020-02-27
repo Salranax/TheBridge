@@ -30,9 +30,17 @@ public class GridSystem : MonoBehaviour
     }
 
     public void generateGrid(int sizeX, int sizeY){
-
+        grid = new gridType[sizeX, sizeY];
+        cubeGrid = new Cube[sizeX, sizeY];
     }
 
+    public void addToGrid(gridType _type, int _x, int _y){
+        grid[_x, _y] = _type;
+    }
+
+    public void addToCubegrid(Cube _cube, int _x, int _y){
+        cubeGrid[_x, _y] = _cube;
+    }
 }
 
 public enum gridType

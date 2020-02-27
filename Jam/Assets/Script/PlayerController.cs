@@ -81,7 +81,9 @@ public class PlayerController : MonoBehaviour
                 isSwiped = false;
             }
             else{
+                // if(){
 
+                // }
             }
         }
         else if(resetTurn){
