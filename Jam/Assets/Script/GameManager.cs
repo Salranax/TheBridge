@@ -10,8 +10,11 @@ public class GameManager : MonoBehaviour
     [Header("Controller Scripts")]
     public PlayerController _PlayerController;
     public GridSystem _GridSystem;
+    public TickManager _TickManager;
     [Header("----------------------")]
+    public CinemachineVirtualCamera startCam;
     public CinemachineVirtualCamera playerCam;
+    public CinemachineVirtualCamera playerCamTOP;
     private string LevelPrefName = "LevelProgress";
     private string UnlockPrefNsame = "LastUnlocked";
 
@@ -38,6 +41,8 @@ public class GameManager : MonoBehaviour
         playerCam.Priority = 11;
         int[] lvl = formatGetter(getLevel());
         setLevelData(lvl[0], lvl[1]);
+
+        StartCoroutine(startCoroutine());
     }
 
     public void increaseLevel(){
@@ -55,6 +60,13 @@ public class GameManager : MonoBehaviour
         UIManager.instance.setLevel(lvlTmp[0], lvlTmp[1]);
 
         setLevel(lvlTmp[0], lvlTmp[1]);
+    }
+
+    IEnumerator startCoroutine(){
+        yield return new WaitForSeconds(2f);
+        _TickManager.startGame();
+
+        yield return new WaitForEndOfFrame();
     }
 
     public void decreaseLevel(){

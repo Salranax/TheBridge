@@ -6,12 +6,14 @@ using UnityEngine.SceneManagement;
 public class PlayerController : MonoBehaviour
 {
     public static PlayerController instance;
+    public GameManager _GameManager;
     
     public int gridX, gridY;
     private Vector2 currentGridCoord;
 
     Quaternion startOrientation;
     SwipeDirection dir;
+    private MoveDirection moveDirection = MoveDirection.Forward;
 
     private bool isSwiped = false;
     private bool resetTurn = false;
@@ -25,6 +27,8 @@ public class PlayerController : MonoBehaviour
 
     public void setPlayerPoint(Vector2 _pos){
         transform.localPosition = new Vector3(_pos.x, _pos.y, -0.7f);
+        gridX = Mathf.FloorToInt(_pos.x);
+        gridY = Mathf.FloorToInt(_pos.y);
     }
 
     void Awake() {
@@ -32,6 +36,7 @@ public class PlayerController : MonoBehaviour
             instance = this;
         }    
     }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -81,9 +86,27 @@ public class PlayerController : MonoBehaviour
                 isSwiped = false;
             }
             else{
-                // if(){
-
-                // }
+                GridSystem _GridSystem = _GameManager._GridSystem;
+                if(moveDirection == MoveDirection.Forward){
+                    if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.floor){
+                        gridY ++;
+                        StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
+                    }
+                    else if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.empty){
+                        gridY ++;
+                        isFalling = true;
+                        StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
+                    }
+                }
+                else if(moveDirection == MoveDirection.Back){
+                    
+                }
+                else if(moveDirection == MoveDirection.Left){
+                    
+                }
+                else if(moveDirection == MoveDirection.Right){
+                    
+                }
             }
         }
         else if(resetTurn){
@@ -178,6 +201,8 @@ public class PlayerController : MonoBehaviour
         else if(isFalling){
             GetComponent<Rigidbody>().isKinematic = false;
             GetComponent<Rigidbody>().AddForce(new Vector3(0,0,500));
+
+            _GameManager.playerCamTOP.Priority = 12;
         }
 
         yield return new WaitForEndOfFrame();
@@ -253,11 +278,19 @@ public class PlayerController : MonoBehaviour
         tmpMat.color = Color.white;
 
         isTooMuch = false;
-
+        
         yield return new WaitForEndOfFrame();
     }
 
     private void intervalChanged(){
         tickInterval = TickManager.instance.GetTickInterval();
     }
+}
+
+public enum MoveDirection
+{
+    Left,
+    Right,
+    Forward,
+    Back
 }
