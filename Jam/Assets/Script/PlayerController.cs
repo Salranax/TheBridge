@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
 {
     public static PlayerController instance;
     public GameManager _GameManager;
+    public CameraManager _CameraManager;
     
     public int gridX, gridY;
     private Vector2 currentGridCoord;
@@ -14,6 +15,7 @@ public class PlayerController : MonoBehaviour
     Quaternion startOrientation;
     SwipeDirection dir;
     private MoveDirection moveDirection = MoveDirection.Forward;
+    private MoveDirection nextMoveDirection = MoveDirection.Forward;
 
     private bool isSwiped = false;
     private bool resetTurn = false;
@@ -67,52 +69,75 @@ public class PlayerController : MonoBehaviour
 
     public void movePlayer(){
         if(!resetTurn && !isTooMuch && !isFalling){
-            if(isSwiped && dir != SwipeDirection.Down){
-                if(dir == SwipeDirection.Left){
-                    if(gridX == 0){
-                        gridX--;
-                        isFalling = true;
-                        StartCoroutine(Rotate90(Vector3.up, new Vector3(gridX, gridY, -0.5f)));
-                    }
-                    else{
-                        gridX--;
-                        StartCoroutine(Rotate90(Vector3.up, new Vector3(gridX, gridY, -0.5f)));
-                    }
-                }
-                else if(dir == SwipeDirection.Right){
+            if(isSwiped){
+                _CameraManager.setCameraDirection(nextMoveDirection);
 
-                }
+                moveDirection = nextMoveDirection;
+                movePlayerPhysically(moveDirection);
 
                 isSwiped = false;
             }
             else{
-                GridSystem _GridSystem = _GameManager._GridSystem;
-                if(moveDirection == MoveDirection.Forward){
-                    if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.floor){
-                        gridY ++;
-                        StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
-                    }
-                    else if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.empty){
-                        gridY ++;
-                        isFalling = true;
-                        StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
-                    }
-                }
-                else if(moveDirection == MoveDirection.Back){
-                    
-                }
-                else if(moveDirection == MoveDirection.Left){
-                    
-                }
-                else if(moveDirection == MoveDirection.Right){
-                    
-                }
+                movePlayerPhysically(moveDirection);
             }
         }
         else if(resetTurn){
             //resetPlayer();
         }
 
+    }
+
+    private void movePlayerPhysically(MoveDirection _dir){
+        GridSystem _GridSystem = _GameManager._GridSystem;
+
+        if(moveDirection == MoveDirection.Forward){
+            if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.floor){
+                gridY ++;
+                StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
+            }
+            else if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.empty){
+                gridY ++;
+                isFalling = true;
+                StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
+            }
+        }
+        else if(moveDirection == MoveDirection.Back){
+            if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.floor){
+                gridY ++;
+                StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
+            }
+            else if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.empty){
+                gridY ++;
+                isFalling = true;
+                StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
+            }
+        }
+        else if(moveDirection == MoveDirection.Left){
+            if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.floor){
+                gridY ++;
+                StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
+            }
+            else if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.empty){
+                gridY ++;
+                isFalling = true;
+                StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
+            }
+        }
+        else if(moveDirection == MoveDirection.Right){
+            if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.floor){
+                gridY ++;
+                StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
+            }
+            else if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.empty){
+                gridY ++;
+                isFalling = true;
+                StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
+            }
+        }
+    }
+
+    private void moveWithGridCoord(int _GridX, int _GridY){
+        //TODO: move player physically ifs to here
     }
 
     public IEnumerator dimLight(){
@@ -133,6 +158,7 @@ public class PlayerController : MonoBehaviour
         dir = dt.Direction;
         if(dir == SwipeDirection.Left || dir == SwipeDirection.Right){
             isSwiped = true;
+            nextMoveDirection = calculateSwipeDirection(dt);
         }
     }
 
@@ -284,6 +310,47 @@ public class PlayerController : MonoBehaviour
 
     private void intervalChanged(){
         tickInterval = TickManager.instance.GetTickInterval();
+    }
+
+    //Compare swipe data and decide next moves direction
+    private MoveDirection calculateSwipeDirection(SwipeData dt){
+        if(dt.Direction == SwipeDirection.Left){
+            if(moveDirection == MoveDirection.Forward){
+                return MoveDirection.Left;
+            }
+            else if(moveDirection == MoveDirection.Right){
+                return MoveDirection.Forward;
+            }
+            else if(moveDirection == MoveDirection.Back){
+                return MoveDirection.Right;
+            }
+            else if(moveDirection == MoveDirection.Left){
+                return MoveDirection.Back;
+            }
+            else{
+                return MoveDirection.Forward;
+            }
+        }
+        else if(dt.Direction == SwipeDirection.Right){
+            if(moveDirection == MoveDirection.Forward){
+                return MoveDirection.Right;
+            }
+            else if(moveDirection == MoveDirection.Right){
+                return MoveDirection.Back;
+            }
+            else if(moveDirection == MoveDirection.Back){
+                return MoveDirection.Left;
+            }
+            else if(moveDirection == MoveDirection.Left){
+                return MoveDirection.Forward;
+            }
+            else{
+                return MoveDirection.Forward;
+            }
+        }
+        else{
+            return MoveDirection.Forward;
+        }
     }
 }
 
