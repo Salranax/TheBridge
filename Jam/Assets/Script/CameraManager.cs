@@ -22,10 +22,10 @@ public class CameraManager : MonoBehaviour
             playerCam.Priority = 10;
         }
         else if(_dir == MoveDirection.Right){
-            playerCamRIGHT.Priority = 10;
+            playerCamLEFT.Priority = 10;
         }
         else if(_dir == MoveDirection.Left){
-            playerCamLEFT.Priority = 10;
+            playerCamRIGHT.Priority = 10;
         }
         else if(_dir == MoveDirection.Back){
             playerCamBACK.Priority = 10;

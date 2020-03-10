@@ -43,7 +43,13 @@ public class GridSystem : MonoBehaviour
     }
 
     public gridType getGridType(int x, int y){
-        return grid[x,y];
+        //Validation for next position in grid borders 
+        if(x >= grid.GetLength(0) || x < 0 || y < 0 || y >= grid.GetLength(1) ){
+            return gridType.empty;
+        }
+        else{
+            return grid[x,y];
+        }
     }
 }
 

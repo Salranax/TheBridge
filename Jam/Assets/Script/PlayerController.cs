@@ -89,6 +89,8 @@ public class PlayerController : MonoBehaviour
 
     private void movePlayerPhysically(MoveDirection _dir){
         GridSystem _GridSystem = _GameManager._GridSystem;
+        
+        //TODO: Array length check!
 
         if(moveDirection == MoveDirection.Forward){
             if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.floor){
@@ -102,36 +104,36 @@ public class PlayerController : MonoBehaviour
             }
         }
         else if(moveDirection == MoveDirection.Back){
-            if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.floor){
-                gridY ++;
-                StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
+            if(_GridSystem.getGridType(gridX, gridY - 1) == gridType.floor){
+                gridY --;
+                StartCoroutine(Rotate90(-Vector3.right, new Vector3(gridX, gridY, -0.5f)));
             }
-            else if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.empty){
-                gridY ++;
+            else if(_GridSystem.getGridType(gridX, gridY - 1) == gridType.empty){
+                gridY --;
                 isFalling = true;
-                StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
+                StartCoroutine(Rotate90(-Vector3.right, new Vector3(gridX, gridY, -0.5f)));
             }
         }
         else if(moveDirection == MoveDirection.Left){
-            if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.floor){
-                gridY ++;
-                StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
+            if(_GridSystem.getGridType(gridX - 1, gridY) == gridType.floor){
+                gridX --;
+                StartCoroutine(Rotate90(Vector3.up, new Vector3(gridX, gridY, -0.5f)));
             }
-            else if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.empty){
-                gridY ++;
+            else if(_GridSystem.getGridType(gridX - 1, gridY) == gridType.empty){
+                gridX --;
                 isFalling = true;
-                StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
+                StartCoroutine(Rotate90(Vector3.up, new Vector3(gridX, gridY, -0.5f)));
             }
         }
         else if(moveDirection == MoveDirection.Right){
-            if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.floor){
-                gridY ++;
-                StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
+            if(_GridSystem.getGridType(gridX + 1, gridY) == gridType.floor){
+                gridX ++;
+                StartCoroutine(Rotate90(-Vector3.up, new Vector3(gridX, gridY, -0.5f)));
             }
-            else if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.empty){
-                gridY ++;
+            else if(_GridSystem.getGridType(gridX + 1, gridY) == gridType.empty){
+                gridX ++;
                 isFalling = true;
-                StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
+                StartCoroutine(Rotate90(-Vector3.up, new Vector3(gridX, gridY, -0.5f)));
             }
         }
     }
@@ -158,18 +160,20 @@ public class PlayerController : MonoBehaviour
         dir = dt.Direction;
         if(dir == SwipeDirection.Left || dir == SwipeDirection.Right){
             isSwiped = true;
-            nextMoveDirection = calculateSwipeDirection(dt);
+            nextMoveDirection = calculateSwipeDirection(dt.Direction);
         }
     }
 
     public void swipeRight(){
         isSwiped = true;
         dir = SwipeDirection.Right;
+        nextMoveDirection = calculateSwipeDirection(dir);
     }
 
     public void swipeLeft(){
         isSwiped = true;
         dir = SwipeDirection.Left;
+        nextMoveDirection = calculateSwipeDirection(dir);
     }
 
     public void resetPlayer(){
@@ -313,8 +317,9 @@ public class PlayerController : MonoBehaviour
     }
 
     //Compare swipe data and decide next moves direction
-    private MoveDirection calculateSwipeDirection(SwipeData dt){
-        if(dt.Direction == SwipeDirection.Left){
+    private MoveDirection calculateSwipeDirection(SwipeDirection _dir){
+        //Debug.Log(dt.Direction);
+        if(_dir == SwipeDirection.Left){
             if(moveDirection == MoveDirection.Forward){
                 return MoveDirection.Left;
             }
@@ -331,7 +336,7 @@ public class PlayerController : MonoBehaviour
                 return MoveDirection.Forward;
             }
         }
-        else if(dt.Direction == SwipeDirection.Right){
+        else if(_dir == SwipeDirection.Right){
             if(moveDirection == MoveDirection.Forward){
                 return MoveDirection.Right;
             }
