@@ -42,12 +42,11 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        TickManager.instance.tick.AddListener(movePlayer);
+        //TickManager.instance.tick.AddListener(movePlayer);
         TickManager.instance.tickTimeChanged.AddListener(intervalChanged);
 
         tickInterval = TickManager.instance.GetTickInterval();
 
-        //transform.localPosition = new Vector3(0, 4, -0.5f);
         startEmissionColor = GetComponent<Renderer>().material.GetColor("_EmissionColor");
     }
 
