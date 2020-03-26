@@ -13,6 +13,7 @@ public class UIManager : MonoBehaviour
     public Button nextLevel;
     public Text objectiveCount;
     public GameObject progressTable;
+    public Slider lightSlider;
 
     // Start is called before the first frame update
     void Awake()
@@ -36,6 +37,10 @@ public class UIManager : MonoBehaviour
 
     public void setLevel(int dozen, int figure){
         levelNumber.text = dozen.ToString() + " - " + figure.ToString();
+    }
+
+    public void reloadScene(){
+        SceneManager.LoadSceneAsync(0);
     }
 
     private void Update() {

@@ -11,7 +11,6 @@ public class CameraManager : MonoBehaviour
     public CinemachineVirtualCamera playerCamTOP;
     public CinemachineVirtualCamera playerCamLEFT;
     public CinemachineVirtualCamera playerCamRIGHT;
-    public CinemachineVirtualCamera playerCamBACK;
 
     public void setCameraDirection(MoveDirection _dir){
         //Resets All cam priorities to Default
@@ -22,18 +21,18 @@ public class CameraManager : MonoBehaviour
             playerCam.Priority = 10;
         }
         else if(_dir == MoveDirection.Right){
-            playerCamLEFT.Priority = 10;
-        }
-        else if(_dir == MoveDirection.Left){
             playerCamRIGHT.Priority = 10;
         }
+        else if(_dir == MoveDirection.Left){
+            playerCamLEFT.Priority = 10;
+        }
         else if(_dir == MoveDirection.Back){
-            playerCamBACK.Priority = 10;
+            playerCam.Priority = 10;
         }
     }
 
     private void resetCamPriority(){
-        startCam.Priority = playerCam.Priority = playerCamTOP.Priority = playerCamLEFT.Priority = playerCamRIGHT.Priority = playerCamBACK.Priority = 8;
+        startCam.Priority = playerCam.Priority = playerCamTOP.Priority = playerCamLEFT.Priority = playerCamRIGHT.Priority = 8;
     }
 
 }

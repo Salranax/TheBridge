@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
     public static PlayerController instance;
     public GameManager _GameManager;
     public CameraManager _CameraManager;
+    private PlayerLightController _PlayerLightController;
     
     public int gridX, gridY;
     private Vector2 currentGridCoord;
@@ -21,9 +22,14 @@ public class PlayerController : MonoBehaviour
     private bool resetTurn = false;
     private bool isTooMuch = false;
     private bool isFalling = false;
+    private bool isHolding = false;
     private int startX = 5, startY = 3;
     private float tickInterval;
     public Color startEmissionColor;
+
+    //Player Values
+    private float timePower = 10f;
+    private float timePowerDecreaseSpeed = 2f;
 
     private float timer = 0;
 
@@ -48,6 +54,11 @@ public class PlayerController : MonoBehaviour
         tickInterval = TickManager.instance.GetTickInterval();
 
         startEmissionColor = GetComponent<Renderer>().material.GetColor("_EmissionColor");
+
+        _PlayerLightController = GetComponent<PlayerLightController>();
+
+        _GameManager._UIManager.lightSlider.maxValue = timePower;
+        _GameManager._UIManager.lightSlider.value = timePower;
     }
 
     void Update()
@@ -64,10 +75,24 @@ public class PlayerController : MonoBehaviour
                 SceneManager.LoadSceneAsync(0);
             }
         }
+
+        if(isHolding){
+            timePower -= Time.deltaTime * timePowerDecreaseSpeed;
+            _GameManager._UIManager.lightSlider.value = timePower;
+            if(timePower < 0){
+                TickManager.instance.SetIsGameStarted(false);
+                _GameManager._UIManager.fail();  
+            }
+        }
+    }
+
+    public void setTouchHoldStatus(bool _isHolding){
+        isHolding = _isHolding;
+        _PlayerLightController.setHoldingStatus(isHolding);
     }
 
     public void movePlayer(){
-        if(!resetTurn && !isTooMuch && !isFalling){
+        if(!resetTurn && !isTooMuch && !isFalling && !isHolding){
             if(isSwiped){
                 _CameraManager.setCameraDirection(nextMoveDirection);
 
@@ -157,23 +182,41 @@ public class PlayerController : MonoBehaviour
 
     public void getSwipe(SwipeData dt){
         dir = dt.Direction;
-        if(dir == SwipeDirection.Left || dir == SwipeDirection.Right){
+        if(dir == SwipeDirection.Left){
             isSwiped = true;
-            nextMoveDirection = calculateSwipeDirection(dt.Direction);
+            nextMoveDirection = MoveDirection.Left;
+        }
+        else if(dir == SwipeDirection.Right){
+            isSwiped = true;
+            nextMoveDirection = MoveDirection.Right;
+        }
+        else if(dir == SwipeDirection.Up){
+            isSwiped = true;
+            nextMoveDirection = MoveDirection.Forward;
         }
     }
-
+    
+    //For editor use
     public void swipeRight(){
         isSwiped = true;
-        dir = SwipeDirection.Right;
-        nextMoveDirection = calculateSwipeDirection(dir);
+        nextMoveDirection = MoveDirection.Right;
     }
 
     public void swipeLeft(){
         isSwiped = true;
-        dir = SwipeDirection.Left;
-        nextMoveDirection = calculateSwipeDirection(dir);
+        nextMoveDirection = MoveDirection.Left;
     }
+
+    public void swipeUp(){
+        isSwiped = true;
+        nextMoveDirection = MoveDirection.Forward;
+    }
+
+    public void swipeDown(){
+        isSwiped = true;
+        nextMoveDirection = MoveDirection.Back;
+    }
+    //
 
     public void resetPlayer(){
 

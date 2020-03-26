@@ -21,6 +21,7 @@ public class SwipeManager : MonoBehaviour
             {
                 fingerUpPosition = touch.position;
                 fingerDownPosition = touch.position;
+                PlayerController.instance.setTouchHoldStatus(true);
             }
 
             if (!detectSwipeOnlyAfterRelease && touch.phase == TouchPhase.Moved)
@@ -45,10 +46,23 @@ public class SwipeManager : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.RightArrow)){
             PlayerController.instance.swipeRight();
         }
+        if(Input.GetKeyDown(KeyCode.UpArrow)){
+            PlayerController.instance.swipeUp();
+        }
+        if(Input.GetKeyDown(KeyCode.DownArrow)){
+            PlayerController.instance.swipeDown();
+        }
+        if(Input.GetKeyDown(KeyCode.Space)){
+            PlayerController.instance.setTouchHoldStatus(true);
+        }
+        if(Input.GetKeyUp(KeyCode.Space)){
+            PlayerController.instance.setTouchHoldStatus(false);
+        }
     }
 
     private void DetectSwipe()
     {
+        PlayerController.instance.setTouchHoldStatus(false);
         if (SwipeDistanceCheckMet())
         {
             if (IsVerticalSwipe())

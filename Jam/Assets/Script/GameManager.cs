@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     public PlayerController _PlayerController;
     public GridSystem _GridSystem;
     public TickManager _TickManager;
+    public UIManager _UIManager;
     [Header("----------------------")]
     public CinemachineVirtualCamera startCam;
     public CinemachineVirtualCamera playerCam;
