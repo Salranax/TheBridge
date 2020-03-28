@@ -26,46 +26,26 @@ public class rotationTest : MonoBehaviour
     private float _sensitivity;
     private Vector3 _mouseReference;
     private Vector3 _mouseOffset;
-    private Vector3 _rotation;
+    private Vector3 _rotationAnchor;
     private bool _isRotating;
     
     void Start ()
     {
         _sensitivity = 0.4f;
-        _rotation = Vector3.zero;
     }
     
     void Update()
     {
         if(_isRotating)
         {
-            // offset
-            _mouseOffset = (Input.mousePosition - _mouseReference);
-            
-            // apply rotation
-            // if(_mouseOffset.x > 0 && _mouseOffset.y > 0){
-            //     _rotation.y = (Mathf.Abs(_mouseOffset.x) + Mathf.Abs(_mouseOffset.y)) * _sensitivity;
-            // }
-            // else if(_mouseOffset.x > 0 && _mouseOffset.y > 0){
-
-            // }
-            // else if(){
-
-            // }
-            
-            
-            _rotation.y = (Mathf.Abs(_mouseOffset.x) + Mathf.Abs(_mouseOffset.y)) * _sensitivity;
-            
-            // rotate
-            transform.Rotate(_rotation);
-            
-            // store mouse
-            _mouseReference = Input.mousePosition;
+            transform.RotateAround(_rotationAnchor, Vector3.back, Time.deltaTime * 90);
+            //Debug.DrawLine(new Vector3(transform.position.x, transform.position.y - 2, transform.position.z + 2), Vector3.right);
         }
     }
     
     void OnMouseDown()
     {
+        _rotationAnchor = new Vector3(transform.position.x + 2, transform.position.y - 2, transform.position.z);
         // rotating flag
         _isRotating = true;
         

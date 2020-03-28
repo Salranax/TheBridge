@@ -48,7 +48,7 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //TickManager.instance.tick.AddListener(movePlayer);
+        TickManager.instance.tick.AddListener(movePlayer);
         TickManager.instance.tickTimeChanged.AddListener(intervalChanged);
 
         tickInterval = TickManager.instance.GetTickInterval();
@@ -94,7 +94,7 @@ public class PlayerController : MonoBehaviour
     public void movePlayer(){
         if(!resetTurn && !isTooMuch && !isFalling && !isHolding){
             if(isSwiped){
-                _CameraManager.setCameraDirection(nextMoveDirection);
+                //_CameraManager.setCameraDirection(nextMoveDirection);
 
                 moveDirection = nextMoveDirection;
                 movePlayerPhysically(moveDirection);
@@ -114,56 +114,50 @@ public class PlayerController : MonoBehaviour
     private void movePlayerPhysically(MoveDirection _dir){
         GridSystem _GridSystem = _GameManager._GridSystem;
         
-        //TODO: Array length check!
-
         if(moveDirection == MoveDirection.Forward){
             if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.floor){
                 gridY ++;
-                StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
+                StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.7f), MoveDirection.Forward));
             }
             else if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.empty){
                 gridY ++;
                 isFalling = true;
-                StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.5f)));
+                StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.7f), MoveDirection.Forward));
             }
         }
         else if(moveDirection == MoveDirection.Back){
             if(_GridSystem.getGridType(gridX, gridY - 1) == gridType.floor){
                 gridY --;
-                StartCoroutine(Rotate90(-Vector3.right, new Vector3(gridX, gridY, -0.5f)));
+                StartCoroutine(Rotate90(-Vector3.right, new Vector3(gridX, gridY, -0.7f), MoveDirection.Back));
             }
             else if(_GridSystem.getGridType(gridX, gridY - 1) == gridType.empty){
                 gridY --;
                 isFalling = true;
-                StartCoroutine(Rotate90(-Vector3.right, new Vector3(gridX, gridY, -0.5f)));
+                StartCoroutine(Rotate90(-Vector3.right, new Vector3(gridX, gridY, -0.7f), MoveDirection.Back));
             }
         }
         else if(moveDirection == MoveDirection.Left){
             if(_GridSystem.getGridType(gridX - 1, gridY) == gridType.floor){
                 gridX --;
-                StartCoroutine(Rotate90(Vector3.up, new Vector3(gridX, gridY, -0.5f)));
+                StartCoroutine(Rotate90(Vector3.up, new Vector3(gridX, gridY, -0.7f), MoveDirection.Left));
             }
             else if(_GridSystem.getGridType(gridX - 1, gridY) == gridType.empty){
                 gridX --;
                 isFalling = true;
-                StartCoroutine(Rotate90(Vector3.up, new Vector3(gridX, gridY, -0.5f)));
+                StartCoroutine(Rotate90(Vector3.up, new Vector3(gridX, gridY, -0.7f), MoveDirection.Left));
             }
         }
         else if(moveDirection == MoveDirection.Right){
             if(_GridSystem.getGridType(gridX + 1, gridY) == gridType.floor){
                 gridX ++;
-                StartCoroutine(Rotate90(-Vector3.up, new Vector3(gridX, gridY, -0.5f)));
+                StartCoroutine(Rotate90(-Vector3.up, new Vector3(gridX, gridY, -0.7f), MoveDirection.Right));
             }
             else if(_GridSystem.getGridType(gridX + 1, gridY) == gridType.empty){
                 gridX ++;
                 isFalling = true;
-                StartCoroutine(Rotate90(-Vector3.up, new Vector3(gridX, gridY, -0.5f)));
+                StartCoroutine(Rotate90(-Vector3.up, new Vector3(gridX, gridY, -0.7f), MoveDirection.Right));
             }
         }
-    }
-
-    private void moveWithGridCoord(int _GridX, int _GridY){
-        //TODO: move player physically ifs to here
     }
 
     public IEnumerator dimLight(){
@@ -253,24 +247,47 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForEndOfFrame();
     }
 
-    private IEnumerator Rotate90(Vector3 axis, Vector3 finalPos) {
+    private IEnumerator Rotate90(Vector3 axis, Vector3 finalPos, MoveDirection _dir = MoveDirection.Forward) {
         startOrientation = transform.rotation;
         axis = transform.InverseTransformDirection(axis);
-        float amount = 0;
+        float speed = 0;
+        int _dirCoeff = 1;
 
-        while (amount < tickInterval / 2) {
-            amount += Time.deltaTime;
-            transform.rotation = startOrientation*Quaternion.AngleAxis(Mathf.Lerp(0,90,amount / tickInterval * 2), axis);
-            transform.localPosition = Vector3.Lerp(transform.localPosition, finalPos, amount / tickInterval * 2 / 3);
+        Vector3 _rotatePoint = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z + 0.5f);;
+        Vector3 _rotateAxis = Vector3.right;;
+
+        if(_dir == MoveDirection.Forward){
+            _rotatePoint = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z + 0.5f);
+            _rotateAxis = Vector3.right;
+        }
+        else if(_dir == MoveDirection.Back){
+            _rotatePoint = new Vector3(transform.position.x, transform.position.y - 0.5f, transform.position.z + 0.5f);
+            _rotateAxis = Vector3.right;
+            _dirCoeff = -1;
+        }
+        else if(_dir == MoveDirection.Left){
+            _rotatePoint = new Vector3(transform.position.x - 0.5f, transform.position.y, transform.position.z + 0.5f);
+            _rotateAxis = Vector3.up;
+        }
+        else if(_dir == MoveDirection.Right){
+            _rotatePoint = new Vector3(transform.position.x + 0.5f, transform.position.y, transform.position.z + 0.5f);
+            _rotateAxis = Vector3.up;
+            _dirCoeff = -1;
+        }
+        float totalRotation = 0;
+
+        while(totalRotation < 90){
+            speed += 180 / (tickInterval * tickInterval * 4 / 9) * Time.deltaTime;
+
+            transform.RotateAround(_rotatePoint, _rotateAxis, speed * Time.deltaTime * _dirCoeff);
+            totalRotation += speed * Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
+
         transform.rotation = startOrientation * Quaternion.AngleAxis(90, axis);
         transform.localPosition = finalPos;
 
-        if(!isFalling){
-
-        }
-        else if(isFalling){
+        if(isFalling){
             GetComponent<Rigidbody>().isKinematic = false;
             GetComponent<Rigidbody>().AddForce(new Vector3(0,0,500));
 
