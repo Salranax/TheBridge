@@ -6,7 +6,8 @@ using UnityEngine;
 //Color(150,150,150,255) Ground
 //Color(255,0,0,255) Spawn Point
 //Color(0,0,0,255) Enemy
-//
+//Color(255,255,0,255) Slot
+//Color(100,255,0,255) Black Hole
 
 public class TextureLevelGenerator : MonoBehaviour
 {   
@@ -55,9 +56,10 @@ public class TextureLevelGenerator : MonoBehaviour
     // 0: Ground
     // 1: Spawn Point
     // 2: Enemy
-    //
+    // 3: Slot
+
     void GenerateTile(int x, int y){
-        Color pixelColor = map.GetPixel(x,y);
+        Color32 pixelColor = map.GetPixel(x,y);
 
         if(pixelColor.a == 0){
             //Ignore if pixel is transparent
@@ -77,11 +79,31 @@ public class TextureLevelGenerator : MonoBehaviour
             activeSpawnPoint = new SpawnPoint(new Vector2(x, y));
             _GameManager._PlayerController.setPlayerPoint(new Vector2(x, y));
             Vector2 position = new Vector2(x, y);
-            GameObject _tmpGrid = Instantiate(colorMappings[0].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
+            GameObject _tmpGrid = Instantiate(colorMappings[1].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
             _tmpGrid.transform.localPosition = new Vector2(x, y);  
         }
         else if(colorMappings[2].color.Equals(pixelColor)){
-            
+            //TODO: ENEMY SPAWN
+            _GameManager._GridSystem.addToGrid(gridType.empty, x, y);
+        }
+        else if(colorMappings[3].color.Equals(pixelColor)){
+            _GameManager._GridSystem.addToGrid(gridType.slot, x, y);
+
+            Vector2 position = new Vector2(x, y);
+            GameObject _tmpGrid = Instantiate(colorMappings[3].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
+            _tmpGrid.transform.localPosition = new Vector2(x, y); 
+        }
+        else if(colorMappings[4].color.Equals(pixelColor)){
+            Debug.Log("black hole");
+            _GameManager._GridSystem.addToGrid(gridType.blackhole, x, y);
+
+            Vector2 position = new Vector2(x, y);
+            GameObject _tmpGrid = Instantiate(colorMappings[4].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
+            _tmpGrid.transform.localPosition = new Vector2(x, y); 
+        }
+        else{
+            Debug.Log(x + " " + y);
+            Debug.Log(colorMappings[4].color);
         }
 
         // foreach (ColorToPrefab item in colorMappings)

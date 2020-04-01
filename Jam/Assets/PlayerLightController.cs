@@ -9,9 +9,11 @@ public class PlayerLightController : MonoBehaviour
     private bool isHolding = false;
     private float speed = 20f;
     private float defaultAngle;
+    private float _defaultIntensity;
 
     void Start() {
         defaultAngle = followLight.spotAngle;
+        _defaultIntensity = followLight.intensity;
     }
 
     void Update() {
@@ -27,6 +29,15 @@ public class PlayerLightController : MonoBehaviour
         else if(!_isHolding){
             isHolding = _isHolding;
             resetLight();
+        }
+    }
+
+    public void toggleLight(bool _IO){
+        if(_IO){
+            followLight.intensity = _defaultIntensity;
+        }
+        else if(!_IO){
+            followLight.intensity = 0;
         }
     }
 

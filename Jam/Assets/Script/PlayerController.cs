@@ -124,6 +124,11 @@ public class PlayerController : MonoBehaviour
                 isFalling = true;
                 StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.7f), MoveDirection.Forward));
             }
+            else if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.blackhole){
+                gridY ++;
+                _PlayerLightController.toggleLight(false);
+                StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.7f), MoveDirection.Forward, gridType.blackhole));
+            }
         }
         else if(moveDirection == MoveDirection.Back){
             if(_GridSystem.getGridType(gridX, gridY - 1) == gridType.floor){
@@ -134,6 +139,11 @@ public class PlayerController : MonoBehaviour
                 gridY --;
                 isFalling = true;
                 StartCoroutine(Rotate90(-Vector3.right, new Vector3(gridX, gridY, -0.7f), MoveDirection.Back));
+            }
+            else if(_GridSystem.getGridType(gridX, gridY - 1) == gridType.blackhole){
+                gridY --;
+                _PlayerLightController.toggleLight(false);
+                StartCoroutine(Rotate90(-Vector3.right, new Vector3(gridX, gridY, -0.7f), MoveDirection.Back, gridType.blackhole));
             }
         }
         else if(moveDirection == MoveDirection.Left){
@@ -146,6 +156,11 @@ public class PlayerController : MonoBehaviour
                 isFalling = true;
                 StartCoroutine(Rotate90(Vector3.up, new Vector3(gridX, gridY, -0.7f), MoveDirection.Left));
             }
+            else if(_GridSystem.getGridType(gridX - 1, gridY) == gridType.blackhole){
+                gridX --;
+                _PlayerLightController.toggleLight(false);
+                StartCoroutine(Rotate90(Vector3.up, new Vector3(gridX, gridY, -0.7f), MoveDirection.Left, gridType.blackhole));
+            }
         }
         else if(moveDirection == MoveDirection.Right){
             if(_GridSystem.getGridType(gridX + 1, gridY) == gridType.floor){
@@ -156,6 +171,11 @@ public class PlayerController : MonoBehaviour
                 gridX ++;
                 isFalling = true;
                 StartCoroutine(Rotate90(-Vector3.up, new Vector3(gridX, gridY, -0.7f), MoveDirection.Right));
+            }
+            else if(_GridSystem.getGridType(gridX + 1, gridY) == gridType.blackhole){
+                gridX ++;
+                _PlayerLightController.toggleLight(false);
+                StartCoroutine(Rotate90(-Vector3.up, new Vector3(gridX, gridY, -0.7f), MoveDirection.Right, gridType.blackhole));
             }
         }
     }
@@ -247,7 +267,7 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForEndOfFrame();
     }
 
-    private IEnumerator Rotate90(Vector3 axis, Vector3 finalPos, MoveDirection _dir = MoveDirection.Forward) {
+    private IEnumerator Rotate90(Vector3 axis, Vector3 finalPos, MoveDirection _dir = MoveDirection.Forward,gridType _type = gridType.floor) {
         startOrientation = transform.rotation;
         axis = transform.InverseTransformDirection(axis);
         float speed = 0;
@@ -287,6 +307,10 @@ public class PlayerController : MonoBehaviour
         transform.rotation = startOrientation * Quaternion.AngleAxis(90, axis);
         transform.localPosition = finalPos;
 
+        if(_type == gridType.floor){
+            _PlayerLightController.toggleLight(true);
+        }
+        
         if(isFalling){
             GetComponent<Rigidbody>().isKinematic = false;
             GetComponent<Rigidbody>().AddForce(new Vector3(0,0,500));
@@ -299,7 +323,7 @@ public class PlayerController : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if(other.tag == "Enemy" && !isFalling && !resetTurn){
+        if(other.CompareTag("Enemy") && !isFalling && !resetTurn){
             StopAllCoroutines();
             StartCoroutine("enemyHitAnim");
         }

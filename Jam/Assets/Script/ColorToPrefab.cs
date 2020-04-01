@@ -3,6 +3,6 @@
 [System.Serializable]
 public class ColorToPrefab
 {
-    public Color color;
+    public Color32 color;
     public GameObject prefab;
 }

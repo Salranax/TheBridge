@@ -13,6 +13,7 @@ public class GridSystem : MonoBehaviour
     //Generation System
     public GameObject cubePrefab;
     public GameObject spotEffect;
+    private TriggerObject[] triggerObjects;
 
     void Awake()
     {
@@ -26,7 +27,7 @@ public class GridSystem : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        TickManager.instance.tick.AddListener(checkTriggerObjects);
     }
 
     public void generateGrid(int sizeX, int sizeY){
@@ -51,6 +52,17 @@ public class GridSystem : MonoBehaviour
             return grid[x,y];
         }
     }
+
+    public void addTriggerObject(){
+
+    }
+
+    public void checkTriggerObjects(){
+        foreach (TriggerObject obj in triggerObjects)
+        {
+            obj.checkDistance(PlayerController.instance.transform.position);
+        }
+    }
 }
 
 public enum gridType
@@ -59,5 +71,5 @@ public enum gridType
     slot,
     enemy,
     floor,
-    trap
+    blackhole
 }
