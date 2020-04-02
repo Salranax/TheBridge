@@ -106,7 +106,7 @@ public class PlayerController : MonoBehaviour
             }
         }
         else if(resetTurn){
-            //resetPlayer();
+            
         }
 
     }
@@ -327,6 +327,10 @@ public class PlayerController : MonoBehaviour
             StopAllCoroutines();
             StartCoroutine("enemyHitAnim");
         }
+        else if(other.CompareTag("PillarOfDarkness") && !isFalling && !resetTurn){
+            StopAllCoroutines();
+            StartCoroutine(pillarCollisionEffect());
+        }
     }
 
     IEnumerator enemyHitAnim(){
@@ -360,6 +364,10 @@ public class PlayerController : MonoBehaviour
 
         resetTurn = false;
 
+        yield return new WaitForEndOfFrame();
+    }
+
+    IEnumerator pillarCollisionEffect(){
         yield return new WaitForEndOfFrame();
     }
 

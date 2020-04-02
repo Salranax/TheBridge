@@ -94,16 +94,28 @@ public class TextureLevelGenerator : MonoBehaviour
             _tmpGrid.transform.localPosition = new Vector2(x, y); 
         }
         else if(colorMappings[4].color.Equals(pixelColor)){
-            Debug.Log("black hole");
             _GameManager._GridSystem.addToGrid(gridType.blackhole, x, y);
 
             Vector2 position = new Vector2(x, y);
             GameObject _tmpGrid = Instantiate(colorMappings[4].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
             _tmpGrid.transform.localPosition = new Vector2(x, y); 
         }
+        else if(colorMappings[5].color.Equals(pixelColor)){
+            _GameManager._GridSystem.addToGrid(gridType.pillarofdarkness, x, y);
+
+            Vector2 position = new Vector2(x, y);
+            GameObject _tmpGrid = Instantiate(colorMappings[5].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
+            _tmpGrid.transform.localPosition = new Vector2(x, y); 
+        }
+        else if(colorMappings[6].color.Equals(pixelColor)){
+            _GameManager._GridSystem.addToGrid(gridType.pillarofdarkness, x, y);
+
+            Vector2 position = new Vector2(x, y);
+            GameObject _tmpGrid = Instantiate(colorMappings[6].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
+            _tmpGrid.transform.localPosition = new Vector2(x, y); 
+        }
         else{
-            Debug.Log(x + " " + y);
-            Debug.Log(colorMappings[4].color);
+
         }
 
         // foreach (ColorToPrefab item in colorMappings)
