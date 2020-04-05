@@ -331,6 +331,10 @@ public class PlayerController : MonoBehaviour
             StopAllCoroutines();
             StartCoroutine(pillarCollisionEffect());
         }
+        else if(other.CompareTag("Projectile") && !isFalling && !resetTurn){
+            StopAllCoroutines();
+            Debug.Log("LOSE");
+        }
     }
 
     IEnumerator enemyHitAnim(){
