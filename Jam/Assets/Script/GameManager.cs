@@ -43,6 +43,8 @@ public class GameManager : MonoBehaviour
         int[] lvl = formatGetter(getLevel());
         setLevelData(lvl[0], lvl[1]);
 
+        _TickManager.gameStart.Invoke();
+
         StartCoroutine(startCoroutine());
     }
 

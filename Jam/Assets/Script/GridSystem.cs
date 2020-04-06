@@ -8,7 +8,7 @@ public class GridSystem : MonoBehaviour
     public static GridSystem instance;
 
     public gridType[,] grid;
-    public Cube[,] cubeGrid;
+    public GameObject[,] cubeGrid;
 
     //Generation System
     public GameObject cubePrefab;
@@ -31,15 +31,25 @@ public class GridSystem : MonoBehaviour
 
     public void generateGrid(int sizeX, int sizeY){
         grid = new gridType[sizeX, sizeY];
-        cubeGrid = new Cube[sizeX, sizeY];
+        cubeGrid = new GameObject[sizeX, sizeY];
     }
 
     public void addToGrid(gridType _type, int _x, int _y){
         grid[_x, _y] = _type;
     }
 
-    public void addToCubegrid(Cube _cube, int _x, int _y){
+    public void addToCubegrid(GameObject _cube, int _x, int _y){
         cubeGrid[_x, _y] = _cube;
+    }
+
+    public GameObject getGridGameobject(int x, int y){
+        if(cubeGrid[x,y] != null){
+            return cubeGrid[x,y];
+        }
+        else{
+            return null;
+        }
+
     }
 
     public gridType getGridType(int x, int y){
@@ -60,5 +70,6 @@ public enum gridType
     enemy,
     floor,
     blackhole,
-    pillarofdarkness
+    pillarofdarkness,
+    trapdoor
 }

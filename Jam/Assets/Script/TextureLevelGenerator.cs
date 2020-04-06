@@ -71,6 +71,9 @@ public class TextureLevelGenerator : MonoBehaviour
 
             Vector2 position = new Vector2(x, y);
             GameObject _tmpGrid = Instantiate(colorMappings[0].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
+
+            _GameManager._GridSystem.addToCubegrid(_tmpGrid, x, y);
+
             _tmpGrid.transform.localPosition = new Vector2(x, y);  
         }
         else if(colorMappings[1].color.Equals(pixelColor)){
@@ -80,6 +83,9 @@ public class TextureLevelGenerator : MonoBehaviour
             _GameManager._PlayerController.setPlayerPoint(new Vector2(x, y));
             Vector2 position = new Vector2(x, y);
             GameObject _tmpGrid = Instantiate(colorMappings[1].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
+
+            _GameManager._GridSystem.addToCubegrid(_tmpGrid, x, y);
+
             _tmpGrid.transform.localPosition = new Vector2(x, y);  
         }
         else if(colorMappings[2].color.Equals(pixelColor)){
@@ -91,6 +97,9 @@ public class TextureLevelGenerator : MonoBehaviour
 
             Vector2 position = new Vector2(x, y);
             GameObject _tmpGrid = Instantiate(colorMappings[3].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
+
+            _GameManager._GridSystem.addToCubegrid(_tmpGrid, x, y);
+
             _tmpGrid.transform.localPosition = new Vector2(x, y); 
         }
         else if(colorMappings[4].color.Equals(pixelColor)){
@@ -98,6 +107,9 @@ public class TextureLevelGenerator : MonoBehaviour
 
             Vector2 position = new Vector2(x, y);
             GameObject _tmpGrid = Instantiate(colorMappings[4].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
+
+            _GameManager._GridSystem.addToCubegrid(_tmpGrid, x, y);
+
             _tmpGrid.transform.localPosition = new Vector2(x, y); 
         }
         else if(colorMappings[5].color.Equals(pixelColor)){
@@ -105,6 +117,9 @@ public class TextureLevelGenerator : MonoBehaviour
 
             Vector2 position = new Vector2(x, y);
             GameObject _tmpGrid = Instantiate(colorMappings[5].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
+
+            _GameManager._GridSystem.addToCubegrid(_tmpGrid, x, y);
+
             _tmpGrid.transform.localPosition = new Vector2(x, y); 
         }
         else if(colorMappings[6].color.Equals(pixelColor)){
@@ -112,6 +127,20 @@ public class TextureLevelGenerator : MonoBehaviour
 
             Vector2 position = new Vector2(x, y);
             GameObject _tmpGrid = Instantiate(colorMappings[6].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
+
+            _GameManager._GridSystem.addToCubegrid(_tmpGrid, x, y);
+
+            _tmpGrid.transform.localPosition = new Vector2(x, y); 
+        }
+        else if(colorMappings[7].color.Equals(pixelColor)){
+            _GameManager._GridSystem.addToGrid(gridType.trapdoor, x, y);
+
+            Vector2 position = new Vector2(x, y);
+            GameObject _tmpGrid = Instantiate(colorMappings[7].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
+
+            _GameManager._GridSystem.addToCubegrid(_tmpGrid, x, y);
+            _tmpGrid.GetComponent<TrapDoor>().gridCoord = new Vector2(x,y);
+
             _tmpGrid.transform.localPosition = new Vector2(x, y); 
         }
         else{

@@ -7,6 +7,7 @@ public class Projectile : MonoBehaviour
     private MoveDirection projectileDirection;
     private Vector3 moveVector;
     private int moveDistance = 3;
+    private float tickInterval;
 
     public void SetProjectile(Vector3 _startpos, MoveDirection _direction){
         _startpos += new Vector3(0,0, -0.40f);
@@ -21,17 +22,18 @@ public class Projectile : MonoBehaviour
             transform.eulerAngles = new Vector3(0,90,0);
         }
 
-        transform.localPosition = _startpos + moveVector;
+        transform.localPosition = _startpos;
+        StartCoroutine(projectileMove(_startpos + moveVector));  
     }
 
     void Start()
     {
         TickManager.instance.tick.AddListener(moveProjectile);
+        tickInterval = TickManager.instance.GetTickInterval();
     }
 
     void moveProjectile(){
-        transform.localPosition += moveVector;
-
+        StartCoroutine(projectileMove(transform.localPosition + moveVector));
     }
 
     private Vector3 positionCalculation(MoveDirection _dir){
@@ -51,6 +53,21 @@ public class Projectile : MonoBehaviour
         }
 
         return _moveVector;
+    }
+
+    IEnumerator projectileMove(Vector3 _targetPos){
+        float _timer = 0;
+        Vector3 _startpos = transform.localPosition;
+        float _completeTime = tickInterval * 2 / 3;
+
+        while (_timer < _completeTime)
+        {   
+            _timer += Time.deltaTime;
+            transform.localPosition = Vector3.Lerp(_startpos, _targetPos, _timer / _completeTime);
+            yield return new WaitForEndOfFrame();
+        }
+
+        transform.localPosition = _targetPos;
     }
 
     

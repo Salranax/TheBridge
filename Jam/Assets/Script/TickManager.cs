@@ -10,6 +10,7 @@ public class TickManager : MonoBehaviour
     private float tickInterval = 0.60f;
     public UnityEvent tick;
     public UnityEvent tickTimeChanged;
+    public UnityEvent gameStart;
     
     private float tickTime = 0;
     private bool isGameStarted = false;

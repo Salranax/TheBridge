@@ -335,6 +335,9 @@ public class PlayerController : MonoBehaviour
             StopAllCoroutines();
             Debug.Log("LOSE");
         }
+        else if(other.CompareTag("TrapDoor") && !isFalling && !resetTurn){
+            Debug.Log("Trap Door");
+        }
     }
 
     IEnumerator enemyHitAnim(){
