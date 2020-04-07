@@ -111,6 +111,15 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    private void fallNow(){
+        GetComponent<Rigidbody>().velocity = Vector3.zero;
+        GetComponent<Rigidbody>().isKinematic = false;
+        GetComponent<Rigidbody>().AddForce(new Vector3(0,0,500));
+
+        _GameManager.playerCamTOP.Priority = 12;
+        TickManager.instance.tick.RemoveListener(movePlayer);
+    }
+
     private void movePlayerPhysically(MoveDirection _dir){
         GridSystem _GridSystem = _GameManager._GridSystem;
         
@@ -336,6 +345,9 @@ public class PlayerController : MonoBehaviour
             Debug.Log("LOSE");
         }
         else if(other.CompareTag("TrapDoor") && !isFalling && !resetTurn){
+            //StopAllCoroutines();
+            isFalling = true;
+            //fallNow();
             Debug.Log("Trap Door");
         }
     }

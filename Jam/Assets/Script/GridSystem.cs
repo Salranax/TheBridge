@@ -71,5 +71,6 @@ public enum gridType
     floor,
     blackhole,
     pillarofdarkness,
-    trapdoor
+    trapdoor,
+    stompball
 }

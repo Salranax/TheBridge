@@ -143,6 +143,17 @@ public class TextureLevelGenerator : MonoBehaviour
 
             _tmpGrid.transform.localPosition = new Vector2(x, y); 
         }
+        else if(colorMappings[8].color.Equals(pixelColor)){
+            _GameManager._GridSystem.addToGrid(gridType.stompball, x, y);
+
+            Vector2 position = new Vector2(x, y);
+            GameObject _tmpGrid = Instantiate(colorMappings[8].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
+
+            _GameManager._GridSystem.addToCubegrid(_tmpGrid, x, y);
+            _tmpGrid.GetComponent<StompBall>().gridCoord = new Vector2(x,y);
+
+            _tmpGrid.transform.localPosition = new Vector2(x, y); 
+        }
         else{
 
         }
