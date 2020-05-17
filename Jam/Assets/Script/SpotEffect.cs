@@ -9,15 +9,16 @@ public class SpotEffect : MonoBehaviour
     {
         spawntime += Time.deltaTime;
 
-        if(spawntime < 1f){
+        if(spawntime < 0.4f){
             pointL.intensity = spawntime * 2;
         }
-        else if(spawntime > 1f){
+        else if(spawntime > 0.4f){
             pointL.intensity = 2 - (spawntime); 
         }
 
-        if(spawntime > 2f){
-            Destroy(this.gameObject);
+        if(spawntime > 1.2f){
+            spawntime = 0;
+            this.gameObject.SetActive(false);
         }
     }
 }

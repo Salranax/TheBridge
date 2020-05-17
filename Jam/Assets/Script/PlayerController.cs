@@ -26,6 +26,7 @@ public class PlayerController : MonoBehaviour
     private int startX = 5, startY = 3;
     private float tickInterval;
     public Color startEmissionColor;
+    public GameObject slotEffect;
 
     //Player Values
     private float timePower = 10f;
@@ -53,12 +54,9 @@ public class PlayerController : MonoBehaviour
 
         tickInterval = TickManager.instance.GetTickInterval();
 
-        startEmissionColor = GetComponent<Renderer>().material.GetColor("_EmissionColor");
+        //startEmissionColor = GetComponent<Renderer>().material.GetColor("_EmissionColor");
 
         _PlayerLightController = GetComponent<PlayerLightController>();
-
-        _GameManager._UIManager.lightSlider.maxValue = timePower;
-        _GameManager._UIManager.lightSlider.value = timePower;
     }
 
     void Update()
@@ -70,25 +68,24 @@ public class PlayerController : MonoBehaviour
         }
         else if(!isFalling && transform.position.z > 10f){
             timer += Time.deltaTime;
-            UIManager.instance.fail();
             if(timer > 2f){
                 SceneManager.LoadSceneAsync(0);
             }
         }
 
-        if(isHolding){
-            timePower -= Time.deltaTime * timePowerDecreaseSpeed;
-            _GameManager._UIManager.lightSlider.value = timePower;
-            if(timePower < 0){
-                TickManager.instance.SetIsGameStarted(false);
-                _GameManager._UIManager.fail();  
-            }
-        }
+        // if(isHolding){
+        //     timePower -= Time.deltaTime * timePowerDecreaseSpeed;
+        //     _GameManager._UIManager.lightSlider.value = timePower;
+        //     if(timePower < 0){
+        //         TickManager.instance.SetIsGameStarted(false);
+        //         _GameManager._UIManager.fail();  
+        //     }
+        // }
     }
 
     public void setTouchHoldStatus(bool _isHolding){
-        isHolding = _isHolding;
-        _PlayerLightController.setHoldingStatus(isHolding);
+        // isHolding = _isHolding;
+        // _PlayerLightController.setHoldingStatus(isHolding);
     }
 
     public void movePlayer(){
@@ -106,9 +103,8 @@ public class PlayerController : MonoBehaviour
             }
         }
         else if(resetTurn){
-            
+            resetTurn =! resetTurn;
         }
-
     }
 
     private void fallNow(){
@@ -124,67 +120,46 @@ public class PlayerController : MonoBehaviour
         GridSystem _GridSystem = _GameManager._GridSystem;
         
         if(moveDirection == MoveDirection.Forward){
-            if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.floor){
-                gridY ++;
-                StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.7f), MoveDirection.Forward));
-            }
-            else if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.empty){
-                gridY ++;
-                isFalling = true;
-                StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.7f), MoveDirection.Forward));
-            }
-            else if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.blackhole){
-                gridY ++;
-                _PlayerLightController.toggleLight(false);
-                StartCoroutine(Rotate90(Vector3.right, new Vector3(gridX, gridY, -0.7f), MoveDirection.Forward, gridType.blackhole));
-            }
+            gridY ++;
+            gridCalc(gridX, gridY, Vector3.right, new Vector3(gridX, gridY + 1, -0.7f), MoveDirection.Forward);
         }
         else if(moveDirection == MoveDirection.Back){
-            if(_GridSystem.getGridType(gridX, gridY - 1) == gridType.floor){
-                gridY --;
-                StartCoroutine(Rotate90(-Vector3.right, new Vector3(gridX, gridY, -0.7f), MoveDirection.Back));
-            }
-            else if(_GridSystem.getGridType(gridX, gridY - 1) == gridType.empty){
-                gridY --;
-                isFalling = true;
-                StartCoroutine(Rotate90(-Vector3.right, new Vector3(gridX, gridY, -0.7f), MoveDirection.Back));
-            }
-            else if(_GridSystem.getGridType(gridX, gridY - 1) == gridType.blackhole){
-                gridY --;
-                _PlayerLightController.toggleLight(false);
-                StartCoroutine(Rotate90(-Vector3.right, new Vector3(gridX, gridY, -0.7f), MoveDirection.Back, gridType.blackhole));
-            }
+            gridY --;
+            gridCalc(gridX, gridY, -Vector3.right, new Vector3(gridX, gridY - 1, -0.7f), MoveDirection.Back);
         }
         else if(moveDirection == MoveDirection.Left){
-            if(_GridSystem.getGridType(gridX - 1, gridY) == gridType.floor){
-                gridX --;
-                StartCoroutine(Rotate90(Vector3.up, new Vector3(gridX, gridY, -0.7f), MoveDirection.Left));
-            }
-            else if(_GridSystem.getGridType(gridX - 1, gridY) == gridType.empty){
-                gridX --;
-                isFalling = true;
-                StartCoroutine(Rotate90(Vector3.up, new Vector3(gridX, gridY, -0.7f), MoveDirection.Left));
-            }
-            else if(_GridSystem.getGridType(gridX - 1, gridY) == gridType.blackhole){
-                gridX --;
-                _PlayerLightController.toggleLight(false);
-                StartCoroutine(Rotate90(Vector3.up, new Vector3(gridX, gridY, -0.7f), MoveDirection.Left, gridType.blackhole));
-            }
+            gridX --;
+            gridCalc(gridX, gridY, Vector3.up, new Vector3(gridX - 1, gridY, -0.7f), MoveDirection.Left);
         }
         else if(moveDirection == MoveDirection.Right){
-            if(_GridSystem.getGridType(gridX + 1, gridY) == gridType.floor){
-                gridX ++;
-                StartCoroutine(Rotate90(-Vector3.up, new Vector3(gridX, gridY, -0.7f), MoveDirection.Right));
+            gridX ++;
+            gridCalc(gridX, gridY, -Vector3.up, new Vector3(gridX + 1, gridY, -0.7f), MoveDirection.Right);
+        }
+    }
+
+    private void gridCalc(int x, int y, Vector3 axis, Vector3 finalPos, MoveDirection _dir = MoveDirection.Forward){
+        GridSystem _GridSystem = _GameManager._GridSystem;
+
+        if(_GridSystem.getGridType(x, y) == gridType.floor){
+            StartCoroutine(Rotate90(axis, new Vector3(x, y, -0.7f), _dir));
+        }
+        else if(_GridSystem.getGridType(x, y) == gridType.empty){
+            StartCoroutine(Rotate90(axis, new Vector3(x, y, -0.7f), _dir));
+            isFalling = true;
+        }
+        else if(_GridSystem.getGridType(x, y) == gridType.blackhole){
+            StartCoroutine(Rotate90(axis, new Vector3(x, y, -0.7f), _dir));
+            _PlayerLightController.toggleLight(false);
+        }
+        else if(_GridSystem.getGridType(x, y) == gridType.slot){
+            StartCoroutine(Rotate90(axis, new Vector3(x, y, -0.7f), _dir, gridType.slot));
+        }
+        else if(_GridSystem.getGridType(x, y) == gridType.endfloor){
+            if(_GameManager._ProgressManager.objectiveStatus()){
+                StartCoroutine(Rotate90(axis, new Vector3(x, y, -0.7f), _dir, gridType.endfloor));
             }
-            else if(_GridSystem.getGridType(gridX + 1, gridY) == gridType.empty){
-                gridX ++;
-                isFalling = true;
-                StartCoroutine(Rotate90(-Vector3.up, new Vector3(gridX, gridY, -0.7f), MoveDirection.Right));
-            }
-            else if(_GridSystem.getGridType(gridX + 1, gridY) == gridType.blackhole){
-                gridX ++;
-                _PlayerLightController.toggleLight(false);
-                StartCoroutine(Rotate90(-Vector3.up, new Vector3(gridX, gridY, -0.7f), MoveDirection.Right, gridType.blackhole));
+            else{
+                StartCoroutine(Rotate90(axis, new Vector3(x, y, -0.7f), _dir));
             }
         }
     }
@@ -245,37 +220,6 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    public IEnumerator slotReset(){
-        transform.localScale = new Vector3(0, 0, 0);
-
-        transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, -0.5f);
-
-        float amount = 0;
-
-        while (amount < tickInterval / 2) {
-            amount += Time.deltaTime;
-            transform.localScale = Vector3.Lerp(new Vector3(0, 0, 0), new Vector3(1, 1, 1), amount / tickInterval * 2);
-            yield return new WaitForEndOfFrame();
-        }
-
-        // Vector3 currentPos = transform.localPosition;
-        // transform.localPosition = new Vector3(currentPos.x, currentPos.y, -8);
-        
-        // Vector3 finalPos = new Vector3(currentPos.x, currentPos.y, -0.5f);
-
-        // float amount = 0;
-
-        // while (amount < tickInterval / 2) {
-        //     amount += Time.deltaTime;
-        //     transform.localPosition = Vector3.Lerp(transform.localPosition, finalPos, amount / tickInterval * 2 / 3);
-        //     yield return new WaitForEndOfFrame();
-        // }
-
-        resetTurn = false;
-        
-        yield return new WaitForEndOfFrame();
-    }
-
     private IEnumerator Rotate90(Vector3 axis, Vector3 finalPos, MoveDirection _dir = MoveDirection.Forward,gridType _type = gridType.floor) {
         startOrientation = transform.rotation;
         axis = transform.InverseTransformDirection(axis);
@@ -319,6 +263,54 @@ public class PlayerController : MonoBehaviour
         if(_type == gridType.floor){
             _PlayerLightController.toggleLight(true);
         }
+        else if(_type == gridType.slot){
+            _PlayerLightController.toggleLight(true);
+            resetTurn = true;
+            //ADD SCORE
+            float _time = 0;
+            Vector3 _StartPos = transform.localPosition;
+            Vector3 _FinalPos = new Vector3(transform.localPosition.x, transform.localPosition.y, 0.31f);
+
+            while (_time < tickInterval / 3)
+            {
+                transform.localPosition = Vector3.Lerp(_StartPos, _FinalPos, _time / tickInterval * 3);
+                _time += Time.deltaTime;
+                yield return new WaitForEndOfFrame();
+            }
+
+            transform.localPosition = _FinalPos;
+
+            GameObject _gridObj = _GameManager._GridSystem.getGridGameobject(gridX, gridY);
+            Destroy(_gridObj);
+
+            _gridObj = Instantiate(_GameManager._TextureLevelGenerator.colorMappings[0].prefab, _GameManager._GridSystem.transform);
+            _gridObj.transform.localPosition = new Vector2(gridX, gridY);
+
+            _GameManager._CameraManager.stopFollowing();
+            float _zCoord = -0.7f;
+            _StartPos = transform.localPosition = new Vector3(gridX, gridY, -10f);
+            _FinalPos = new Vector3(gridX, gridY, _zCoord);
+
+            _time = 0;
+            while (_time < tickInterval * 2 / 3)
+            {
+                transform.localPosition = Vector3.Lerp(_StartPos, _FinalPos, _time * 3 / tickInterval / 2);
+                _time += Time.deltaTime;
+                yield return new WaitForEndOfFrame();
+            }
+
+            slotEffect.transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z - 0.1f);
+            slotEffect.SetActive(true);
+
+            transform.localPosition = _FinalPos;
+            transform.rotation = Quaternion.identity;
+            _GameManager._ProgressManager.increaseSlotScore();
+            _GameManager._CameraManager.startFollowing(transform);
+        }
+        else if(_type == gridType.endfloor){
+            _GameManager._TickManager.SetIsGameStarted(false);
+            _GameManager.endGame();
+        }
         
         if(isFalling){
             GetComponent<Rigidbody>().isKinematic = false;
@@ -345,7 +337,6 @@ public class PlayerController : MonoBehaviour
             Debug.Log("LOSE");
         }
         else if(other.CompareTag("TrapDoor") && !isFalling && !resetTurn){
-            //StopAllCoroutines();
             isFalling = true;
             //fallNow();
             Debug.Log("Trap Door");
@@ -356,12 +347,9 @@ public class PlayerController : MonoBehaviour
         float t = 0;
         Material tmpMat = GetComponent<Renderer>().material;
         
-        Color currentColor = tmpMat.GetColor("_EmissionColor");
+        // Color currentColor = tmpMat.GetColor("_EmissionColor");
 
         while(t < tickInterval / 2){
-            transform.localScale = Vector3.Lerp(new Vector3(1,1,1), new Vector3(0,0,0),t / tickInterval * 4);
-            tmpMat.SetColor("_EmissionColor", Color.Lerp(currentColor, Color.black, t / tickInterval * 2));
-            tmpMat.color = Color.Lerp(Color.white, Color.black, t * 4);
             t += Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
@@ -370,16 +358,16 @@ public class PlayerController : MonoBehaviour
 
         resetTurn = true;
 
-        while(t < tickInterval){
-            transform.localScale = Vector3.Lerp(new Vector3(0,0,0), new Vector3(1,1,1),t / tickInterval * 2);
-            tmpMat.SetColor("_EmissionColor", Color.Lerp(Color.black, startEmissionColor, t / tickInterval));
-            tmpMat.color = Color.Lerp(Color.black, Color.white, t * 2);
-            t += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
-        }
+        // while(t < tickInterval){
+        //     transform.localScale = Vector3.Lerp(new Vector3(0,0,0), new Vector3(1,1,1),t / tickInterval * 2);
+        //     tmpMat.SetColor("_EmissionColor", Color.Lerp(Color.black, startEmissionColor, t / tickInterval));
+        //     tmpMat.color = Color.Lerp(Color.black, Color.white, t * 2);
+        //     t += Time.deltaTime;
+        //     yield return new WaitForEndOfFrame();
+        // }
 
-        tmpMat.SetColor("_EmissionColor", startEmissionColor);
-        tmpMat.color = Color.white;
+        // tmpMat.SetColor("_EmissionColor", startEmissionColor);
+        // tmpMat.color = Color.white;
 
         resetTurn = false;
 
@@ -424,48 +412,6 @@ public class PlayerController : MonoBehaviour
 
     private void intervalChanged(){
         tickInterval = TickManager.instance.GetTickInterval();
-    }
-
-    //Compare swipe data and decide next moves direction
-    private MoveDirection calculateSwipeDirection(SwipeDirection _dir){
-        //Debug.Log(dt.Direction);
-        if(_dir == SwipeDirection.Left){
-            if(moveDirection == MoveDirection.Forward){
-                return MoveDirection.Left;
-            }
-            else if(moveDirection == MoveDirection.Right){
-                return MoveDirection.Forward;
-            }
-            else if(moveDirection == MoveDirection.Back){
-                return MoveDirection.Right;
-            }
-            else if(moveDirection == MoveDirection.Left){
-                return MoveDirection.Back;
-            }
-            else{
-                return MoveDirection.Forward;
-            }
-        }
-        else if(_dir == SwipeDirection.Right){
-            if(moveDirection == MoveDirection.Forward){
-                return MoveDirection.Right;
-            }
-            else if(moveDirection == MoveDirection.Right){
-                return MoveDirection.Back;
-            }
-            else if(moveDirection == MoveDirection.Back){
-                return MoveDirection.Left;
-            }
-            else if(moveDirection == MoveDirection.Left){
-                return MoveDirection.Forward;
-            }
-            else{
-                return MoveDirection.Forward;
-            }
-        }
-        else{
-            return MoveDirection.Forward;
-        }
     }
 }
 

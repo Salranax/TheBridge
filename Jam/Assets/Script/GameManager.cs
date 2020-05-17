@@ -5,25 +5,22 @@ using Cinemachine;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager instance;
 
     [Header("Controller Scripts")]
+    [SerializeField]
     public PlayerController _PlayerController;
     public GridSystem _GridSystem;
     public TickManager _TickManager;
     public UIManager _UIManager;
+    public TextureLevelGenerator _TextureLevelGenerator;
+    public CameraManager _CameraManager;
+    public ProgressManager _ProgressManager;
     [Header("----------------------")]
     public CinemachineVirtualCamera startCam;
     public CinemachineVirtualCamera playerCam;
     public CinemachineVirtualCamera playerCamTOP;
     private string LevelPrefName = "LevelProgress";
     private string UnlockPrefNsame = "LastUnlocked";
-
-    void Awake() {
-        if(instance == null){
-            instance = this;
-        }    
-    }
 
     // Start is called before the first frame update
     void Start()
@@ -34,18 +31,23 @@ public class GameManager : MonoBehaviour
         }
 
         int[] lvl = formatGetter(getLevel());
-        UIManager.instance.setLevel(lvl[0], lvl[1]);
-
+        _UIManager.setLevel(lvl[0], lvl[1]);
     }
 
     public void startLevel(){
+        _TextureLevelGenerator.GenerateLevel(getLevel(), generationCallback);
         playerCam.Priority = 11;
         int[] lvl = formatGetter(getLevel());
         setLevelData(lvl[0], lvl[1]);
 
         _TickManager.gameStart.Invoke();
+        _UIManager.activateGameUI();
 
         StartCoroutine(startCoroutine());
+    }
+
+    public void endGame(){
+        _UIManager.win();
     }
 
     public void increaseLevel(){
@@ -60,7 +62,7 @@ public class GameManager : MonoBehaviour
             lvlTmp[1] ++;
         }
 
-        UIManager.instance.setLevel(lvlTmp[0], lvlTmp[1]);
+        _UIManager.setLevel(lvlTmp[0], lvlTmp[1]);
 
         setLevel(lvlTmp[0], lvlTmp[1]);
     }
@@ -84,9 +86,13 @@ public class GameManager : MonoBehaviour
             lvlTmp[1] --;
         }
 
-        UIManager.instance.setLevel(lvlTmp[0], lvlTmp[1]);
+        _UIManager.setLevel(lvlTmp[0], lvlTmp[1]);
 
         setLevel(lvlTmp[0], lvlTmp[1]);
+    }
+
+    private void generationCallback(){
+
     }
 
     private string formatSetter(int dozen, int figure){
@@ -114,7 +120,7 @@ public class GameManager : MonoBehaviour
     }
 
     private void setLevelData(int dozen, int figure){
-        ProgressManager.instance.setLevel(Objectives.levelData(dozen, figure));
+        _ProgressManager.setLevel(Objectives.levelData(dozen, figure));
     }
 
 }

@@ -11,9 +11,14 @@ using UnityEngine;
 
 public class TextureLevelGenerator : MonoBehaviour
 {   
+    public delegate void generationCallback();
     public GameManager _GameManager;
+    public ObjectManager _ObjectManager;
     public Texture2D map;
     public ColorToPrefab[] colorMappings;
+
+    private List<GameObject> _EndingFloors = new List<GameObject>();
+    private generationCallback callback;
 
     public struct SpawnPoint
     {
@@ -30,14 +35,10 @@ public class TextureLevelGenerator : MonoBehaviour
         return activeSpawnPoint;
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        GenerateLevel();
-    }
-
     //Get over every pixel
-    void GenerateLevel(){
+    public void GenerateLevel(string levelData, generationCallback _callback){
+        map = Resources.Load("Levels/" + levelData) as Texture2D;
+        callback = _callback;
 
         _GameManager._GridSystem.generateGrid(map.width, map.height);
 
@@ -60,6 +61,7 @@ public class TextureLevelGenerator : MonoBehaviour
 
     void GenerateTile(int x, int y){
         Color32 pixelColor = map.GetPixel(x,y);
+        Vector2 position = new Vector2(x, y);
 
         if(pixelColor.a == 0){
             //Ignore if pixel is transparent
@@ -67,45 +69,50 @@ public class TextureLevelGenerator : MonoBehaviour
         }
 
         if(colorMappings[0].color.Equals(pixelColor)){
+            //FLOOR
             _GameManager._GridSystem.addToGrid(gridType.floor, x, y);
-
-            Vector2 position = new Vector2(x, y);
-            GameObject _tmpGrid = Instantiate(colorMappings[0].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
+            
+            GameObject _tmpGrid = _ObjectManager.getCubeGameObject(position, Quaternion.identity);
 
             _GameManager._GridSystem.addToCubegrid(_tmpGrid, x, y);
-
-            _tmpGrid.transform.localPosition = new Vector2(x, y);  
         }
         else if(colorMappings[1].color.Equals(pixelColor)){
+            //SPAWN POINT
             _GameManager._GridSystem.addToGrid(gridType.floor, x, y);
 
             activeSpawnPoint = new SpawnPoint(new Vector2(x, y));
             _GameManager._PlayerController.setPlayerPoint(new Vector2(x, y));
-            Vector2 position = new Vector2(x, y);
-            GameObject _tmpGrid = Instantiate(colorMappings[1].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
+
+            GameObject _tmpGrid = _ObjectManager.getCubeGameObject(position, Quaternion.identity);
 
             _GameManager._GridSystem.addToCubegrid(_tmpGrid, x, y);
-
-            _tmpGrid.transform.localPosition = new Vector2(x, y);  
         }
         else if(colorMappings[2].color.Equals(pixelColor)){
-            //TODO: ENEMY SPAWN
-            _GameManager._GridSystem.addToGrid(gridType.empty, x, y);
+            //ENEMY
+            _GameManager._GridSystem.addToGrid(gridType.floor, x, y);
+
+            GameObject _tmpEnemy = Instantiate(colorMappings[2].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
+            GameObject _tmpFloor = _ObjectManager.getCubeGameObject(position, Quaternion.identity);
+
+            _tmpEnemy.GetComponent<EnemyPatrolScript>().setEnemy(_GameManager._GridSystem, x, y);
+
+            _GameManager._GridSystem.addToCubegrid(_tmpFloor, x, y);
         }
         else if(colorMappings[3].color.Equals(pixelColor)){
+            //SLOT
             _GameManager._GridSystem.addToGrid(gridType.slot, x, y);
 
-            Vector2 position = new Vector2(x, y);
             GameObject _tmpGrid = Instantiate(colorMappings[3].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
 
             _GameManager._GridSystem.addToCubegrid(_tmpGrid, x, y);
 
-            _tmpGrid.transform.localPosition = new Vector2(x, y); 
+            _tmpGrid.transform.localPosition = new Vector2(x, y);
+            _GameManager._ProgressManager.increaseGoal(); 
         }
         else if(colorMappings[4].color.Equals(pixelColor)){
+            //BLACK HOLE
             _GameManager._GridSystem.addToGrid(gridType.blackhole, x, y);
 
-            Vector2 position = new Vector2(x, y);
             GameObject _tmpGrid = Instantiate(colorMappings[4].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
 
             _GameManager._GridSystem.addToCubegrid(_tmpGrid, x, y);
@@ -113,9 +120,9 @@ public class TextureLevelGenerator : MonoBehaviour
             _tmpGrid.transform.localPosition = new Vector2(x, y); 
         }
         else if(colorMappings[5].color.Equals(pixelColor)){
+            //PILLAR OF DARKNESS
             _GameManager._GridSystem.addToGrid(gridType.pillarofdarkness, x, y);
 
-            Vector2 position = new Vector2(x, y);
             GameObject _tmpGrid = Instantiate(colorMappings[5].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
 
             _GameManager._GridSystem.addToCubegrid(_tmpGrid, x, y);
@@ -125,7 +132,6 @@ public class TextureLevelGenerator : MonoBehaviour
         else if(colorMappings[6].color.Equals(pixelColor)){
             _GameManager._GridSystem.addToGrid(gridType.pillarofdarkness, x, y);
 
-            Vector2 position = new Vector2(x, y);
             GameObject _tmpGrid = Instantiate(colorMappings[6].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
 
             _GameManager._GridSystem.addToCubegrid(_tmpGrid, x, y);
@@ -135,7 +141,6 @@ public class TextureLevelGenerator : MonoBehaviour
         else if(colorMappings[7].color.Equals(pixelColor)){
             _GameManager._GridSystem.addToGrid(gridType.trapdoor, x, y);
 
-            Vector2 position = new Vector2(x, y);
             GameObject _tmpGrid = Instantiate(colorMappings[7].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
 
             _GameManager._GridSystem.addToCubegrid(_tmpGrid, x, y);
@@ -146,7 +151,6 @@ public class TextureLevelGenerator : MonoBehaviour
         else if(colorMappings[8].color.Equals(pixelColor)){
             _GameManager._GridSystem.addToGrid(gridType.stompball, x, y);
 
-            Vector2 position = new Vector2(x, y);
             GameObject _tmpGrid = Instantiate(colorMappings[8].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
 
             _GameManager._GridSystem.addToCubegrid(_tmpGrid, x, y);
@@ -154,18 +158,21 @@ public class TextureLevelGenerator : MonoBehaviour
 
             _tmpGrid.transform.localPosition = new Vector2(x, y); 
         }
+        else if(colorMappings[9].color.Equals(pixelColor)){
+            _GameManager._GridSystem.addToGrid(gridType.endfloor, x, y);
+
+            GameObject _tmpGrid = Instantiate(colorMappings[9].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
+            
+
+            _GameManager._GridSystem.addToCubegrid(_tmpGrid, x, y);
+
+            _tmpGrid.transform.localPosition = new Vector2(x, y); 
+
+            _GameManager._ProgressManager.setEndGFX(_tmpGrid.transform.GetChild(0).gameObject);
+            //_EndingFloors.Add(_tmpGrid);
+        }
         else{
 
         }
-
-        // foreach (ColorToPrefab item in colorMappings)
-        // {
-        //     if(item.color.Equals(pixelColor)){
-        //         Debug.Log("hops");
-        //         Vector2 position = new Vector2(x, y);
-        //         GameObject _tmpGrid = Instantiate(item.prefab, position, Quaternion.identity, _gridSystem.transform);
-        //         _tmpGrid.transform.localPosition = new Vector2(x, y);
-        //     }
-        // }
     }
 }

@@ -4,34 +4,29 @@ using UnityEngine;
 
 public class ObjectManager : MonoBehaviour
 {
-    public static ObjectManager instance;
+    public GameManager _GameManager;
     public GameObject objectPrefab;
 
     public List<GameObject> idleObjects;
 
-    // Start is called before the first frame update
-    void Awake()
-    {
-        if(instance == null){
-            instance = this;
-        }
-    }
 
-    public GameObject getGameObject(){
+    public GameObject getCubeGameObject(Vector2 _localPos, Quaternion _rotation){
         if(idleObjects.Count == 0){
-            return Instantiate(objectPrefab) as GameObject;
+            GameObject _newGenerated = Instantiate(objectPrefab, _GameManager._GridSystem.transform) as GameObject;
+            _newGenerated.transform.localPosition = _localPos;
+            return _newGenerated;
         }
         else{
             GameObject tmp = idleObjects[0];
             idleObjects.RemoveAt(0);
+            tmp.transform.SetParent(_GameManager._GridSystem.transform);
+            tmp.transform.localPosition = _localPos;
             return tmp;
         }
     }
 
     public void retireObject(GameObject obj){
-        if(obj.tag == "cube"){
-            obj.SetActive(false);
-            idleObjects.Add(obj);
-        }
+        obj.SetActive(false);
+        idleObjects.Add(obj); 
     }
 }

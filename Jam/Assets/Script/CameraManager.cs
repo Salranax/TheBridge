@@ -35,4 +35,16 @@ public class CameraManager : MonoBehaviour
         startCam.Priority = playerCam.Priority = playerCamTOP.Priority = playerCamLEFT.Priority = playerCamRIGHT.Priority = 8;
     }
 
+    public void stopFollowing(){
+        playerCam.Follow = null;
+    }
+
+    public void startFollowing(Transform _follow){
+        playerCam.Follow = _follow;
+    }
+
+    public void moveToTopCam(){
+        playerCamTOP.Priority = 10;
+    }
+
 }

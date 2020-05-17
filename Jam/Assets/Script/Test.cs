@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class Test : MonoBehaviour
 {
+    public GridSystem _GridSystem;
     GameObject tmp;
 
     public void testObjectManager(){
-        tmp = ObjectManager.instance.getGameObject();
+        //tmp = ObjectManager.instance.getGameObject();
     }
 
-    public void retire(){
-        ObjectManager.instance.retireObject(tmp);
-        tmp = null;
+    public void resetGrid(){
+        _GridSystem.resetGrid();
     }
 }

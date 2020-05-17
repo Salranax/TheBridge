@@ -64,6 +64,7 @@ public class StompBall : MonoBehaviour
 
                     if(_tmp == gridCoord){
                         GameObject _tmpObj = _GridSystem.getGridGameobject(Mathf.FloorToInt(stompCoord[i].x), Mathf.FloorToInt(stompCoord[i].y));
+                        stompColliders[i].transform.position = new Vector3(this.transform.position.x, this.transform.position.y, stompColliders[i].transform.position.z);
                         _tmpObj.SetActive(true);
                         stompStatus[i] = false;
                     }

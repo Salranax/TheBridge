@@ -11,6 +11,7 @@ public class EnemyPatrolScript : MonoBehaviour
     }
 
     public int gridX,gridY;
+    private GridSystem _GridSystem;
     private int dir = 1;
     private DirAxis axis = DirAxis.y;
     private bool transforming = false;
@@ -26,32 +27,128 @@ public class EnemyPatrolScript : MonoBehaviour
         tickInterval = TickManager.instance.GetTickInterval();
     }
 
+    public void setEnemy(GridSystem _system, int x, int y){
+        _GridSystem = _system;
+        gridY = y;
+        gridX = x;
+    }
+
     public void moveEnemy(){
         if(!transforming){
-                int redirectChance = Random.Range(0,100);
+            int redirectChance = Random.Range(0,100);
 
-                if(redirectChance >= 0 && redirectChance < 20){
-                    if(axis == DirAxis.y){
-                        axis = DirAxis.x;
+            if(redirectChance >= 0 && redirectChance < 20){
+                axis = changeAxis(axis);
+                dir = 1;
+            }
+
+            if(axis == DirAxis.x){
+                if(dir == 1){
+                    if(_GridSystem.getGridType(gridX + 1, gridY) == gridType.floor){
+                        moveEnemyPhysically(MoveDirection.Right);
+                    }
+                    else if(_GridSystem.getGridType(gridX - 1, gridY) == gridType.floor){
+                        dir *= -1;
+                        moveEnemyPhysically(MoveDirection.Left);
+                    }
+                    else if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.floor){
+                        axis = changeAxis(axis);
+                        dir = 1;
+                        moveEnemyPhysically(MoveDirection.Forward);
                     }
                     else{
-                        axis = DirAxis.y;
+                        //moveEnemyPhysically(MoveDirection.Back);
                     }
-                    dir = 1;
                 }
-            if(axis == DirAxis.x){
-
+                else if(dir == -1){
+                    if(_GridSystem.getGridType(gridX - 1, gridY) == gridType.floor){
+                        moveEnemyPhysically(MoveDirection.Left);
+                    }
+                    else if(_GridSystem.getGridType(gridX + 1, gridY) == gridType.floor){
+                        dir *= -1;
+                        moveEnemyPhysically(MoveDirection.Right);
+                    }
+                    else if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.floor){
+                        axis = changeAxis(axis);
+                        dir = 1;
+                        moveEnemyPhysically(MoveDirection.Forward);
+                    }
+                    else{
+                        //moveEnemyPhysically(MoveDirection.Back);
+                    }
+                }
             }
             else if(axis == DirAxis.y){
+                if(dir == 1){
+                    if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.floor){
+                        moveEnemyPhysically(MoveDirection.Forward);
+                    }
+                    else if(_GridSystem.getGridType(gridX, gridY - 1) == gridType.floor){
+                        dir *= -1;
+                        moveEnemyPhysically(MoveDirection.Back);
+                    }
+                    else if(_GridSystem.getGridType(gridX + 1, gridY) == gridType.floor){
+                        axis = changeAxis(axis);
+                        dir = 1;
+                        moveEnemyPhysically(MoveDirection.Right);
+                    }
+                    else{
+                        //moveEnemyPhysically(MoveDirection.Left);
+                    }
+                }
+                else if(dir == -1){
+                    if(_GridSystem.getGridType(gridX, gridY - 1) == gridType.floor){
+                        moveEnemyPhysically(MoveDirection.Back);
+                    }
+                    else if(_GridSystem.getGridType(gridX, gridY + 1) == gridType.floor){
+                        dir *= -1;
+                        moveEnemyPhysically(MoveDirection.Forward);
+                    }
+                    else if(_GridSystem.getGridType(gridX + 1, gridY) == gridType.floor){
+                        axis = changeAxis(axis);
+                        dir = 1;
+                        moveEnemyPhysically(MoveDirection.Right);
+                    }
+                    else{
+                        // axis = changeAxis(axis);
+                        // dir = -1;
+                        // moveEnemyPhysically(MoveDirection.Left);
+                    }
+                }
+            }
+        }
+    }
 
-            }
+    private DirAxis changeAxis(DirAxis _axis){
+        if(_axis == DirAxis.x){
+            return DirAxis.y;
+        }
+        else{
+            return DirAxis.x;
+        }
+    }
 
-            if(axis == DirAxis.x){
-                StartCoroutine(Rotate90(dir == 1 ? -Vector3.up : Vector3.up , new Vector3(gridX, gridY, -0.5f)));
-            }
-            else if(axis == DirAxis.y){
-                StartCoroutine(Rotate90(dir == 1 ? -Vector3.left : Vector3.left , new Vector3(gridX, gridY, -0.5f)));
-            }
+    private void gridCalc(int x, int y, Vector3 axis, Vector3 finalPos, MoveDirection _dir = MoveDirection.Forward){
+        StartCoroutine(Rotate90(axis, new Vector3(x, y, -0.7f), _dir));
+    }
+
+    private void moveEnemyPhysically(MoveDirection _dir){
+        
+        if(_dir == MoveDirection.Forward){
+            gridY ++;
+            gridCalc(gridX, gridY, Vector3.right, new Vector3(gridX, gridY + 1, -0.7f), MoveDirection.Forward);
+        }
+        else if(_dir == MoveDirection.Back){
+            gridY --;
+            gridCalc(gridX, gridY, -Vector3.right, new Vector3(gridX, gridY - 1, -0.7f), MoveDirection.Back);
+        }
+        else if(_dir == MoveDirection.Left){
+            gridX --;
+            gridCalc(gridX, gridY, Vector3.up, new Vector3(gridX - 1, gridY, -0.7f), MoveDirection.Left);
+        }
+        else if(_dir == MoveDirection.Right){
+            gridX ++;
+            gridCalc(gridX, gridY, -Vector3.up, new Vector3(gridX + 1, gridY, -0.7f), MoveDirection.Right);
         }
     }
 
@@ -61,20 +158,46 @@ public class EnemyPatrolScript : MonoBehaviour
         StartCoroutine("transformToPlayer");
     }
 
-    private IEnumerator Rotate90(Vector3 axis, Vector3 finalPos) {
+    private IEnumerator Rotate90(Vector3 axis, Vector3 finalPos, MoveDirection _dir = MoveDirection.Forward) {
         startOrientation = transform.rotation;
         axis = transform.InverseTransformDirection(axis);
-        float amount = 0;
+        float speed = 0;
+        int _dirCoeff = 1;
 
-        while (amount < tickInterval / 2) {
-            amount += Time.deltaTime;
-            transform.rotation = startOrientation*Quaternion.AngleAxis(Mathf.Lerp(0,90,amount / tickInterval * 2), axis);
-            transform.localPosition = Vector3.Lerp(transform.localPosition, finalPos, amount / tickInterval * 2 / 3);
-            if(transforming){
-                break;
-            }
+        Vector3 _rotatePoint = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z + 0.5f);;
+        Vector3 _rotateAxis = Vector3.right;;
+
+        if(_dir == MoveDirection.Forward){
+            _rotatePoint = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z + 0.5f);
+            _rotateAxis = Vector3.right;
+        }
+        else if(_dir == MoveDirection.Back){
+            _rotatePoint = new Vector3(transform.position.x, transform.position.y - 0.5f, transform.position.z + 0.5f);
+            _rotateAxis = Vector3.right;
+            _dirCoeff = -1;
+        }
+        else if(_dir == MoveDirection.Left){
+            _rotatePoint = new Vector3(transform.position.x - 0.5f, transform.position.y, transform.position.z + 0.5f);
+            _rotateAxis = Vector3.up;
+        }
+        else if(_dir == MoveDirection.Right){
+            _rotatePoint = new Vector3(transform.position.x + 0.5f, transform.position.y, transform.position.z + 0.5f);
+            _rotateAxis = Vector3.up;
+            _dirCoeff = -1;
+        }
+        float totalRotation = 0;
+
+        while(totalRotation < 90){
+            speed += 180 / (tickInterval * tickInterval * 4 / 9) * Time.deltaTime;
+
+            transform.RotateAround(_rotatePoint, _rotateAxis, speed * Time.deltaTime * _dirCoeff);
+            totalRotation += speed * Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
+
+        transform.rotation = startOrientation * Quaternion.AngleAxis(90, axis);
+        transform.localPosition = finalPos;
+
         if(!transforming){
             transform.rotation = startOrientation * Quaternion.AngleAxis(90, axis);
             transform.localPosition = finalPos;
