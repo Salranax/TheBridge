@@ -119,5 +119,6 @@ public enum gridType
     pillarofdarkness,
     trapdoor,
     stompball,
+    pyramid,
     endfloor
 }

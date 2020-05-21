@@ -17,9 +17,9 @@ public class PlayerLightController : MonoBehaviour
     }
 
     void Update() {
-        if(isHolding){
-            followLight.spotAngle -= speed * Time.deltaTime;
-        }
+        // if(isHolding){
+        //     followLight.spotAngle -= speed * Time.deltaTime;
+        // }
     }
 
     public void setHoldingStatus(bool _isHolding){
@@ -41,7 +41,15 @@ public class PlayerLightController : MonoBehaviour
         }
     }
 
-    private void resetLight(){
+    /// <summary>
+    /// Set light intensity as float value, between 0 and 1
+    /// </summary>
+    public void changeLightIntensity(float _intensity){
+        followLight.intensity = Mathf.Lerp(0, _defaultIntensity, _intensity);
+    }
+
+    public void resetLight(){
+        followLight.intensity = _defaultIntensity;
         followLight.spotAngle = defaultAngle;
     }
 

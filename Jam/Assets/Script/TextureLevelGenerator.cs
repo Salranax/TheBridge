@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 //Color Palete
 //Color(150,150,150,255) Ground
@@ -11,14 +12,13 @@ using UnityEngine;
 
 public class TextureLevelGenerator : MonoBehaviour
 {   
-    public delegate void generationCallback();
+    public UnityEvent generationCallback;
     public GameManager _GameManager;
     public ObjectManager _ObjectManager;
     public Texture2D map;
     public ColorToPrefab[] colorMappings;
 
     private List<GameObject> _EndingFloors = new List<GameObject>();
-    private generationCallback callback;
 
     public struct SpawnPoint
     {
@@ -36,9 +36,8 @@ public class TextureLevelGenerator : MonoBehaviour
     }
 
     //Get over every pixel
-    public void GenerateLevel(string levelData, generationCallback _callback){
+    public void GenerateLevel(string levelData){
         map = Resources.Load("Levels/" + levelData) as Texture2D;
-        callback = _callback;
 
         _GameManager._GridSystem.generateGrid(map.width, map.height);
 
@@ -50,6 +49,8 @@ public class TextureLevelGenerator : MonoBehaviour
             }
             
         }
+
+        generationCallback.Invoke();
     }
 
     //Generate map from Pixels
@@ -130,13 +131,14 @@ public class TextureLevelGenerator : MonoBehaviour
             _tmpGrid.transform.localPosition = new Vector2(x, y); 
         }
         else if(colorMappings[6].color.Equals(pixelColor)){
-            _GameManager._GridSystem.addToGrid(gridType.pillarofdarkness, x, y);
+            _GameManager._GridSystem.addToGrid(gridType.pyramid, x, y);
 
             GameObject _tmpGrid = Instantiate(colorMappings[6].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
 
             _GameManager._GridSystem.addToCubegrid(_tmpGrid, x, y);
 
             _tmpGrid.transform.localPosition = new Vector2(x, y); 
+            _tmpGrid.GetComponent<Pyramid>().setPyramid(_ObjectManager);
         }
         else if(colorMappings[7].color.Equals(pixelColor)){
             _GameManager._GridSystem.addToGrid(gridType.trapdoor, x, y);
@@ -144,7 +146,8 @@ public class TextureLevelGenerator : MonoBehaviour
             GameObject _tmpGrid = Instantiate(colorMappings[7].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
 
             _GameManager._GridSystem.addToCubegrid(_tmpGrid, x, y);
-            _tmpGrid.GetComponent<TrapDoor>().gridCoord = new Vector2(x,y);
+            _tmpGrid.GetComponent<TrapDoor>().setTrapDoor(_GameManager._GridSystem, new Vector2(x,y));
+            generationCallback.AddListener(_tmpGrid.GetComponent<TrapDoor>().setTrapdoorGfx);
 
             _tmpGrid.transform.localPosition = new Vector2(x, y); 
         }

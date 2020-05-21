@@ -10,8 +10,12 @@ public class UIManager : MonoBehaviour
     public GameObject winScreen;
     public GameObject failScreen;
     public GameObject gameUI;
+
+    [Header("Start Screen Objects")]
+    public GameObject previousButton;
+    public GameObject nextButton;
     
-    [Header("UI Objects")]
+    [Header("Game UI Objects")]
     public Text levelNumber;
     public Text goalText;
 
@@ -33,5 +37,20 @@ public class UIManager : MonoBehaviour
 
     public void activateGameUI(){
         gameUI.SetActive(true);
+        failScreen.SetActive(false);
+        winScreen.SetActive(false);
     }
+
+    public void toggleDecrease(bool _toogle){
+        previousButton.SetActive(_toogle);
+    }
+
+    public void toggleIncrease(bool _toogle){
+        nextButton.SetActive(_toogle);
+    }   
+
+    //BUTTON Functions
+    public void reloadLevel(){
+
+    } 
 }

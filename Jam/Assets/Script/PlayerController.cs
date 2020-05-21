@@ -18,14 +18,18 @@ public class PlayerController : MonoBehaviour
     private MoveDirection moveDirection = MoveDirection.Forward;
     private MoveDirection nextMoveDirection = MoveDirection.Forward;
 
+    private bool isAlive = true;
     private bool isSwiped = false;
     private bool resetTurn = false;
     private bool isTooMuch = false;
     private bool isFalling = false;
+    private bool steppedEmpty = false;
     private bool isHolding = false;
     private int startX = 5, startY = 3;
     private float tickInterval;
-    public Color startEmissionColor;
+    private Color startEmissionColor;
+    private Color materialColor;
+    private Material playerMaterial;
     public GameObject slotEffect;
 
     //Player Values
@@ -54,22 +58,26 @@ public class PlayerController : MonoBehaviour
 
         tickInterval = TickManager.instance.GetTickInterval();
 
-        //startEmissionColor = GetComponent<Renderer>().material.GetColor("_EmissionColor");
+        playerMaterial = GetComponent<Renderer>().material;
+        startEmissionColor = GetComponent<Renderer>().material.GetColor("Color_C63B14FB");
+        materialColor = GetComponent<Renderer>().material.GetColor("Color_871271A7");
 
         _PlayerLightController = GetComponent<PlayerLightController>();
     }
 
     void Update()
     {
-        if(isFalling && transform.position.z > 10f){
+        if((steppedEmpty || isFalling) && transform.position.z > 10f){
             GetComponent<Rigidbody>().velocity = Vector3.zero;
             TickManager.instance.SetIsGameStarted(false);
             isFalling = false;
+            steppedEmpty = false;
         }
-        else if(!isFalling && transform.position.z > 10f){
+        else if((!steppedEmpty || !isFalling) && transform.position.z > 10f){
             timer += Time.deltaTime;
             if(timer > 2f){
-                SceneManager.LoadSceneAsync(0);
+                //SceneManager.LoadSceneAsync(0);
+                loseCondition();
             }
         }
 
@@ -89,7 +97,7 @@ public class PlayerController : MonoBehaviour
     }
 
     public void movePlayer(){
-        if(!resetTurn && !isTooMuch && !isFalling && !isHolding){
+        if(!resetTurn && !isTooMuch && !isFalling && !isHolding && !steppedEmpty){
             if(isSwiped){
                 //_CameraManager.setCameraDirection(nextMoveDirection);
 
@@ -105,15 +113,6 @@ public class PlayerController : MonoBehaviour
         else if(resetTurn){
             resetTurn =! resetTurn;
         }
-    }
-
-    private void fallNow(){
-        GetComponent<Rigidbody>().velocity = Vector3.zero;
-        GetComponent<Rigidbody>().isKinematic = false;
-        GetComponent<Rigidbody>().AddForce(new Vector3(0,0,500));
-
-        _GameManager.playerCamTOP.Priority = 12;
-        TickManager.instance.tick.RemoveListener(movePlayer);
     }
 
     private void movePlayerPhysically(MoveDirection _dir){
@@ -145,7 +144,7 @@ public class PlayerController : MonoBehaviour
         }
         else if(_GridSystem.getGridType(x, y) == gridType.empty){
             StartCoroutine(Rotate90(axis, new Vector3(x, y, -0.7f), _dir));
-            isFalling = true;
+            steppedEmpty = true;
         }
         else if(_GridSystem.getGridType(x, y) == gridType.blackhole){
             StartCoroutine(Rotate90(axis, new Vector3(x, y, -0.7f), _dir));
@@ -214,10 +213,39 @@ public class PlayerController : MonoBehaviour
         isSwiped = true;
         nextMoveDirection = MoveDirection.Back;
     }
-    //
 
     public void resetPlayer(){
+        //TODO: RESET POSITION
+        playerMaterial.SetColor("Color_C63B14FB", startEmissionColor);
+        playerMaterial.SetColor("Color_871271A7", materialColor);
 
+        transform.rotation = Quaternion.identity;
+
+        _PlayerLightController.resetLight();
+        TickManager.instance.tick.AddListener(movePlayer);
+    }
+
+    private void loseCondition(){
+        isAlive = false;
+        TickManager.instance.tick.RemoveListener(movePlayer);
+        StartCoroutine(loseAction());
+    }
+
+    private IEnumerator loseAction(){
+        float _timer = 0;
+
+        while(_timer < 1f){
+            _timer += Time.deltaTime;
+            playerMaterial.SetColor("Color_C63B14FB" ,Color.Lerp(startEmissionColor, Color.black, _timer));
+            playerMaterial.SetColor("Color_871271A7", Color.Lerp(materialColor, Color.black, _timer));
+            _PlayerLightController.changeLightIntensity(1 - _timer);
+            yield return new WaitForEndOfFrame();
+        }
+
+        TickManager.instance.SetIsGameStarted(false);
+        _GameManager._UIManager.fail();
+
+        yield return new WaitForEndOfFrame();
     }
 
     private IEnumerator Rotate90(Vector3 axis, Vector3 finalPos, MoveDirection _dir = MoveDirection.Forward,gridType _type = gridType.floor) {
@@ -225,6 +253,17 @@ public class PlayerController : MonoBehaviour
         axis = transform.InverseTransformDirection(axis);
         float speed = 0;
         int _dirCoeff = 1;
+
+        yield return new WaitForSeconds(0.1f);
+
+        if(isFalling){
+            GetComponent<Rigidbody>().isKinematic = false;
+            GetComponent<Rigidbody>().AddForce(new Vector3(0,0,500));
+
+            _GameManager.playerCamTOP.Priority = 12;
+
+            StopAllCoroutines();
+        }
 
         Vector3 _rotatePoint = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z + 0.5f);;
         Vector3 _rotateAxis = Vector3.right;;
@@ -312,7 +351,7 @@ public class PlayerController : MonoBehaviour
             _GameManager.endGame();
         }
         
-        if(isFalling){
+        if(isFalling || steppedEmpty){
             GetComponent<Rigidbody>().isKinematic = false;
             GetComponent<Rigidbody>().AddForce(new Vector3(0,0,500));
 
@@ -324,22 +363,25 @@ public class PlayerController : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if(other.CompareTag("Enemy") && !isFalling && !resetTurn){
-            StopAllCoroutines();
-            StartCoroutine("enemyHitAnim");
-        }
-        else if(other.CompareTag("PillarOfDarkness") && !isFalling && !resetTurn){
-            StopAllCoroutines();
-            StartCoroutine(pillarCollisionEffect());
-        }
-        else if(other.CompareTag("Projectile") && !isFalling && !resetTurn){
-            StopAllCoroutines();
-            Debug.Log("LOSE");
-        }
-        else if(other.CompareTag("TrapDoor") && !isFalling && !resetTurn){
-            isFalling = true;
-            //fallNow();
-            Debug.Log("Trap Door");
+        if(isAlive){
+            if(other.CompareTag("Enemy") && !isFalling && !resetTurn){
+                StopAllCoroutines();
+                loseCondition();
+                //StartCoroutine("enemyHitAnim");
+            }
+            else if(other.CompareTag("PillarOfDarkness") && !isFalling && !resetTurn){
+                StopAllCoroutines();
+                loseCondition();
+                //StartCoroutine(pillarCollisionEffect());
+            }
+            else if(other.CompareTag("Projectile") && !isFalling && !resetTurn){
+                StopAllCoroutines();
+                loseCondition();
+                //Debug.Log("LOSE");
+            }
+            else if(other.CompareTag("TrapDoor") && !isFalling && !resetTurn){
+                isFalling = true;
+            }
         }
     }
 

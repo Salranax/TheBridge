@@ -18,6 +18,11 @@ public class TrapDoor : MonoBehaviour
         _GridSystem = transform.parent.GetComponent<GridSystem>();
     }
 
+    public void setTrapDoor(GridSystem _Grid, Vector2 _coord){
+        gridCoord = _coord;
+        _GridSystem = _Grid;
+    }
+
     void trapdoorToggle(){
         if(!doorStatus && round > 1){
             foreach (GameObject item in trapDoorGfx)
@@ -44,12 +49,12 @@ public class TrapDoor : MonoBehaviour
                 item.SetActive(false);
             }
             round ++;
-            doorStatus = !doorStatus; 
+            doorStatus = !doorStatus;
         }
         
     }
 
-    void setTrapdoorGfx(){
+    public void setTrapdoorGfx(){
         Vector2[] gfxCoords = new Vector2[4]{new Vector2(0,+1), new Vector2(0,-1), new Vector2(+1,0), new Vector2(-1,0)};
 
         if(_GridSystem != null){

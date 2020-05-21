@@ -212,9 +212,9 @@ public class EnemyPatrolScript : MonoBehaviour
 
         while (t < tickInterval)
         {
-            tmpMat.EnableKeyword("_EMISSION");
-            tmpMat.SetColor("_EmissionColor", Color.Lerp(Color.black, PlayerController.instance.startEmissionColor, t / tickInterval * 2));
-            tmpMat.color = Color.Lerp(Color.black, Color.white, t / tickInterval * 2);
+            // tmpMat.EnableKeyword("_EMISSION");
+            // tmpMat.SetColor("_EmissionColor", Color.Lerp(Color.black, PlayerController.instance.startEmissionColor, t / tickInterval * 2));
+            // tmpMat.color = Color.Lerp(Color.black, Color.white, t / tickInterval * 2);
             t += Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }

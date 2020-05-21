@@ -3,13 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Projectile : MonoBehaviour
-{
+{   
+    private ObjectManager _ObjectManager;
     private MoveDirection projectileDirection;
     private Vector3 moveVector;
     private int moveDistance = 3;
+    private int moveAmount = 0;
     private float tickInterval;
 
-    public void SetProjectile(Vector3 _startpos, MoveDirection _direction){
+    public void SetProjectile(Vector3 _startpos, MoveDirection _direction, ObjectManager _pooling){
+        TickManager.instance.tick.AddListener(moveProjectile);
+
+        _ObjectManager = _pooling;
+
         _startpos += new Vector3(0,0, -0.40f);
         transform.SetParent(GridSystem.instance.transform);
         projectileDirection = _direction;
@@ -28,12 +34,20 @@ public class Projectile : MonoBehaviour
 
     void Start()
     {
-        TickManager.instance.tick.AddListener(moveProjectile);
         tickInterval = TickManager.instance.GetTickInterval();
     }
 
     void moveProjectile(){
-        StartCoroutine(projectileMove(transform.localPosition + moveVector));
+        if(moveAmount == moveDistance){
+            moveAmount = 0;
+            StopAllCoroutines();
+            TickManager.instance.tick.RemoveListener(moveProjectile);
+            _ObjectManager.retireProjectile(this.gameObject);
+        }
+        else{
+            moveAmount ++;
+            StartCoroutine(projectileMove(transform.localPosition + moveVector));
+        }
     }
 
     private Vector3 positionCalculation(MoveDirection _dir){

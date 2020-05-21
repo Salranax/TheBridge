@@ -21,6 +21,8 @@ public class GameManager : MonoBehaviour
     public CinemachineVirtualCamera playerCamTOP;
     private string LevelPrefName = "LevelProgress";
     private string UnlockPrefNsame = "LastUnlocked";
+    private string LastLevel = "1.5";
+    int[] lastlvl;
 
     // Start is called before the first frame update
     void Start()
@@ -30,12 +32,21 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.SetString(UnlockPrefNsame, formatSetter(1,1));
         }
 
+        lastlvl = formatGetter(LastLevel);
         int[] lvl = formatGetter(getLevel());
+
+        if(lvl[0] == 1 && lvl[1] == 1){
+            _UIManager.toggleDecrease(false);
+        }
+        else if(lastlvl[0] == lvl[0] && lastlvl[1] == lvl[1]){
+            _UIManager.toggleIncrease(false);
+        }
+
         _UIManager.setLevel(lvl[0], lvl[1]);
     }
 
     public void startLevel(){
-        _TextureLevelGenerator.GenerateLevel(getLevel(), generationCallback);
+        _TextureLevelGenerator.GenerateLevel(getLevel());
         playerCam.Priority = 11;
         int[] lvl = formatGetter(getLevel());
         setLevelData(lvl[0], lvl[1]);
@@ -51,9 +62,12 @@ public class GameManager : MonoBehaviour
     }
 
     public void increaseLevel(){
+        _UIManager.toggleDecrease(true);
+
+        
         int[] lvlTmp = new int[2];
         lvlTmp = formatGetter(getLevel());
-        
+
         if(lvlTmp[1] == 10){
             lvlTmp[0] ++;
             lvlTmp[1] = 1;
@@ -65,16 +79,15 @@ public class GameManager : MonoBehaviour
         _UIManager.setLevel(lvlTmp[0], lvlTmp[1]);
 
         setLevel(lvlTmp[0], lvlTmp[1]);
-    }
-
-    IEnumerator startCoroutine(){
-        yield return new WaitForSeconds(2f);
-        _TickManager.startGame();
-
-        yield return new WaitForEndOfFrame();
+        
+        if(lastlvl[0] == lvlTmp[0] && lastlvl[1] == lvlTmp[1]){
+            _UIManager.toggleIncrease(false);
+        }
     }
 
     public void decreaseLevel(){
+        _UIManager.toggleIncrease(true);
+
         int[] lvlTmp = new int[2];
         lvlTmp = formatGetter(getLevel());
 
@@ -89,10 +102,30 @@ public class GameManager : MonoBehaviour
         _UIManager.setLevel(lvlTmp[0], lvlTmp[1]);
 
         setLevel(lvlTmp[0], lvlTmp[1]);
+
+        if(lvlTmp[0] == 1 && lvlTmp[1] == 1){
+            _UIManager.toggleDecrease(false);
+        }
     }
 
-    private void generationCallback(){
+    IEnumerator startCoroutine(){
+        yield return new WaitForSeconds(2f);
+        _TickManager.startGame();
 
+        yield return new WaitForEndOfFrame();
+    }
+
+    public void loadNextLevel(){
+        _PlayerController.resetPlayer();
+        _GridSystem.resetGrid();
+        increaseLevel();
+        startLevel();
+    }
+
+    public void reloadLevel(){
+        _PlayerController.resetPlayer();
+        _GridSystem.resetGrid();
+        startLevel();
     }
 
     private string formatSetter(int dozen, int figure){

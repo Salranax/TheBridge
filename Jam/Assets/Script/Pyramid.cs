@@ -7,11 +7,16 @@ public class Pyramid : MonoBehaviour
     public GameObject projectilePrefab;
     private int cooldown = 4;
     private int turnCounter = 0;
+    private ObjectManager _ObjectManager;
 
     // Start is called before the first frame update
     void Start()
     {
         TickManager.instance.tick.AddListener(shootCheck);
+    }
+
+    public void setPyramid(ObjectManager _pooling){
+        _ObjectManager = _pooling;
     }
 
     private void shootCheck(){
@@ -25,16 +30,16 @@ public class Pyramid : MonoBehaviour
     }
 
     private void shootProjectile(){
-        GameObject tmp = Instantiate(projectilePrefab);
-        tmp.GetComponent<Projectile>().SetProjectile(transform.localPosition, MoveDirection.Forward);
+        GameObject tmp = _ObjectManager.getProjectile();
+        tmp.GetComponent<Projectile>().SetProjectile(transform.localPosition, MoveDirection.Forward, _ObjectManager);
 
-        tmp = Instantiate(projectilePrefab);
-        tmp.GetComponent<Projectile>().SetProjectile(transform.localPosition, MoveDirection.Back);
+        tmp = _ObjectManager.getProjectile();
+        tmp.GetComponent<Projectile>().SetProjectile(transform.localPosition, MoveDirection.Back, _ObjectManager);
 
-        tmp = Instantiate(projectilePrefab);
-        tmp.GetComponent<Projectile>().SetProjectile(transform.localPosition, MoveDirection.Left);
+        tmp = _ObjectManager.getProjectile();
+        tmp.GetComponent<Projectile>().SetProjectile(transform.localPosition, MoveDirection.Left, _ObjectManager);
 
-        tmp = Instantiate(projectilePrefab);
-        tmp.GetComponent<Projectile>().SetProjectile(transform.localPosition, MoveDirection.Right);
+        tmp = _ObjectManager.getProjectile();
+        tmp.GetComponent<Projectile>().SetProjectile(transform.localPosition, MoveDirection.Right, _ObjectManager);
     }
 }
