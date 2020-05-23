@@ -42,8 +42,10 @@ public class ObjectManager : MonoBehaviour
     }
 
     public void retireObject(GameObject obj){
-        obj.SetActive(false);
-        idleObjects.Add(obj); 
+        if(obj != null){
+            obj.SetActive(false);
+            idleObjects.Add(obj); 
+        }
     }
 
     public void retireProjectile(GameObject pj){

@@ -82,7 +82,7 @@ public class TextureLevelGenerator : MonoBehaviour
             _GameManager._GridSystem.addToGrid(gridType.floor, x, y);
 
             activeSpawnPoint = new SpawnPoint(new Vector2(x, y));
-            _GameManager._PlayerController.setPlayerPoint(new Vector2(x, y));
+            _GameManager._PlayerController.setPlayerPoint(new Vector2Int(x, y));
 
             GameObject _tmpGrid = _ObjectManager.getCubeGameObject(position, Quaternion.identity);
 
@@ -96,6 +96,8 @@ public class TextureLevelGenerator : MonoBehaviour
             GameObject _tmpFloor = _ObjectManager.getCubeGameObject(position, Quaternion.identity);
 
             _tmpEnemy.GetComponent<EnemyPatrolScript>().setEnemy(_GameManager._GridSystem, x, y);
+
+            _GameManager._GridSystem.addEnemy(_tmpEnemy);
 
             _GameManager._GridSystem.addToCubegrid(_tmpFloor, x, y);
         }
@@ -131,6 +133,7 @@ public class TextureLevelGenerator : MonoBehaviour
             _tmpGrid.transform.localPosition = new Vector2(x, y); 
         }
         else if(colorMappings[6].color.Equals(pixelColor)){
+            //PYRAMID
             _GameManager._GridSystem.addToGrid(gridType.pyramid, x, y);
 
             GameObject _tmpGrid = Instantiate(colorMappings[6].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
@@ -141,6 +144,7 @@ public class TextureLevelGenerator : MonoBehaviour
             _tmpGrid.GetComponent<Pyramid>().setPyramid(_ObjectManager);
         }
         else if(colorMappings[7].color.Equals(pixelColor)){
+            //TRAPDOOR
             _GameManager._GridSystem.addToGrid(gridType.trapdoor, x, y);
 
             GameObject _tmpGrid = Instantiate(colorMappings[7].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
@@ -152,6 +156,7 @@ public class TextureLevelGenerator : MonoBehaviour
             _tmpGrid.transform.localPosition = new Vector2(x, y); 
         }
         else if(colorMappings[8].color.Equals(pixelColor)){
+            //STOMPBALL
             _GameManager._GridSystem.addToGrid(gridType.stompball, x, y);
 
             GameObject _tmpGrid = Instantiate(colorMappings[8].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);
@@ -162,6 +167,7 @@ public class TextureLevelGenerator : MonoBehaviour
             _tmpGrid.transform.localPosition = new Vector2(x, y); 
         }
         else if(colorMappings[9].color.Equals(pixelColor)){
+            //END FLOOR
             _GameManager._GridSystem.addToGrid(gridType.endfloor, x, y);
 
             GameObject _tmpGrid = Instantiate(colorMappings[9].prefab, position, Quaternion.identity, _GameManager._GridSystem.transform);

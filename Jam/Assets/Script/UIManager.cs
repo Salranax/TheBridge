@@ -18,13 +18,19 @@ public class UIManager : MonoBehaviour
     [Header("Game UI Objects")]
     public Text levelNumber;
     public Text goalText;
+    public GameObject portalImage;
+
+    //PRIVATE VALUES
+    private List<GameObject> openPoups = new List<GameObject>();
 
     public void win(){
         winScreen.SetActive(true);
+        openPoups.Add(winScreen);
     }
 
     public void fail(){
         failScreen.SetActive(true);
+        openPoups.Add(failScreen);
     }
 
     public void setLevel(int dozen, int figure){
@@ -49,8 +55,14 @@ public class UIManager : MonoBehaviour
         nextButton.SetActive(_toogle);
     }   
 
-    //BUTTON Functions
-    public void reloadLevel(){
+    public void closePopups(){
+        foreach (GameObject _popup in openPoups)
+        {
+            _popup.SetActive(false);
+        }
+    }
 
-    } 
+    public void resetGameUI(){
+        portalImage.SetActive(false);
+    }
 }

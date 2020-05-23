@@ -7,7 +7,7 @@ public class Projectile : MonoBehaviour
     private ObjectManager _ObjectManager;
     private MoveDirection projectileDirection;
     private Vector3 moveVector;
-    private int moveDistance = 3;
+    private int moveDistance = 2;
     private int moveAmount = 0;
     private float tickInterval;
 

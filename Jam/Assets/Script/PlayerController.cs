@@ -5,6 +5,10 @@ using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("Timer Mode Status")]
+    public bool TimerMode;
+
+    [Header("Timer Mode Status")]
     public static PlayerController instance;
     public GameManager _GameManager;
     public CameraManager _CameraManager;
@@ -17,6 +21,7 @@ public class PlayerController : MonoBehaviour
     SwipeDirection dir;
     private MoveDirection moveDirection = MoveDirection.Forward;
     private MoveDirection nextMoveDirection = MoveDirection.Forward;
+    private Vector2Int spawnPoint;
 
     private bool isAlive = true;
     private bool isSwiped = false;
@@ -38,10 +43,12 @@ public class PlayerController : MonoBehaviour
 
     private float timer = 0;
 
-    public void setPlayerPoint(Vector2 _pos){
+    public void setPlayerPoint(Vector2Int _pos){
         transform.localPosition = new Vector3(_pos.x, _pos.y, -0.7f);
-        gridX = Mathf.FloorToInt(_pos.x);
-        gridY = Mathf.FloorToInt(_pos.y);
+        gridX = _pos.x;
+        gridY = _pos.y;
+
+        spawnPoint = new Vector2Int(_pos.x, _pos.y);
     }
 
     void Awake() {
@@ -50,13 +57,17 @@ public class PlayerController : MonoBehaviour
         }    
     }
 
-    // Start is called before the first frame update
     void Start()
-    {
-        TickManager.instance.tick.AddListener(movePlayer);
-        TickManager.instance.tickTimeChanged.AddListener(intervalChanged);
+    {   
+        if(TimerMode){
+            TickManager.instance.tick.AddListener(movePlayer);
+            TickManager.instance.tickTimeChanged.AddListener(intervalChanged);
 
-        tickInterval = TickManager.instance.GetTickInterval();
+            tickInterval = TickManager.instance.GetTickInterval();
+        }
+        else if(!TimerMode){
+            tickInterval = 0.4f;
+        }
 
         playerMaterial = GetComponent<Renderer>().material;
         startEmissionColor = GetComponent<Renderer>().material.GetColor("Color_C63B14FB");
@@ -66,18 +77,14 @@ public class PlayerController : MonoBehaviour
     }
 
     void Update()
-    {
-        if((steppedEmpty || isFalling) && transform.position.z > 10f){
-            GetComponent<Rigidbody>().velocity = Vector3.zero;
-            TickManager.instance.SetIsGameStarted(false);
-            isFalling = false;
-            steppedEmpty = false;
-        }
-        else if((!steppedEmpty || !isFalling) && transform.position.z > 10f){
-            timer += Time.deltaTime;
-            if(timer > 2f){
-                //SceneManager.LoadSceneAsync(0);
-                loseCondition();
+    {   
+        if(TickManager.instance.GetIsGameStarted()){
+            if((steppedEmpty || isFalling) && transform.position.z > 10f){
+                GetComponent<Rigidbody>().velocity = Vector3.zero;
+                TickManager.instance.SetIsGameStarted(false);
+                isFalling = false;
+                steppedEmpty = false;
+                loseCondition(); 
             }
         }
 
@@ -104,7 +111,9 @@ public class PlayerController : MonoBehaviour
                 moveDirection = nextMoveDirection;
                 movePlayerPhysically(moveDirection);
 
-                isSwiped = false;
+                if(TimerMode){
+                    isSwiped = false;
+                }
             }
             else{
                 movePlayerPhysically(moveDirection);
@@ -147,7 +156,7 @@ public class PlayerController : MonoBehaviour
             steppedEmpty = true;
         }
         else if(_GridSystem.getGridType(x, y) == gridType.blackhole){
-            StartCoroutine(Rotate90(axis, new Vector3(x, y, -0.7f), _dir));
+            StartCoroutine(Rotate90(axis, new Vector3(x, y, -0.7f), _dir, gridType.blackhole));
             _PlayerLightController.toggleLight(false);
         }
         else if(_GridSystem.getGridType(x, y) == gridType.slot){
@@ -178,48 +187,93 @@ public class PlayerController : MonoBehaviour
     }
 
     public void getSwipe(SwipeData dt){
-        dir = dt.Direction;
-        if(dir == SwipeDirection.Left){
-            isSwiped = true;
-            nextMoveDirection = MoveDirection.Left;
+        if(!isSwiped || TimerMode){
+            dir = dt.Direction;
+            if(dir == SwipeDirection.Left){
+                isSwiped = true;
+                nextMoveDirection = MoveDirection.Left;
+            }
+            else if(dir == SwipeDirection.Right){
+                isSwiped = true;
+                nextMoveDirection = MoveDirection.Right;
+            }
+            else if(dir == SwipeDirection.Up){
+                isSwiped = true;
+                nextMoveDirection = MoveDirection.Forward;
+            }
+            else if(dir == SwipeDirection.Down){
+                isSwiped = true;
+                nextMoveDirection = MoveDirection.Back;
+            }
+
+            if(!TimerMode && !isFalling && !steppedEmpty && isAlive){
+                movePlayer();
+            }
         }
-        else if(dir == SwipeDirection.Right){
-            isSwiped = true;
-            nextMoveDirection = MoveDirection.Right;
-        }
-        else if(dir == SwipeDirection.Up){
-            isSwiped = true;
-            nextMoveDirection = MoveDirection.Forward;
-        }
+
     }
     
     //For editor use
     public void swipeRight(){
-        isSwiped = true;
-        nextMoveDirection = MoveDirection.Right;
+        if(!isSwiped || TimerMode){
+            isSwiped = true;
+            nextMoveDirection = MoveDirection.Right;
+
+            if(!TimerMode && !isFalling && !steppedEmpty && isAlive){
+                movePlayer();
+            }
+        }
     }
 
     public void swipeLeft(){
-        isSwiped = true;
-        nextMoveDirection = MoveDirection.Left;
+        if(!isSwiped || TimerMode){
+            isSwiped = true;
+            nextMoveDirection = MoveDirection.Left;
+
+            if(!TimerMode && !isFalling && !steppedEmpty && isAlive){
+                movePlayer();
+            }
+        }
     }
 
     public void swipeUp(){
-        isSwiped = true;
-        nextMoveDirection = MoveDirection.Forward;
+        if(!isSwiped || TimerMode){
+            isSwiped = true;
+            nextMoveDirection = MoveDirection.Forward;
+
+            if(!TimerMode && !isFalling && !steppedEmpty && isAlive){
+                movePlayer();
+            }
+        }
     }
 
     public void swipeDown(){
-        isSwiped = true;
-        nextMoveDirection = MoveDirection.Back;
+        if(!isSwiped || TimerMode){
+            isSwiped = true;
+            nextMoveDirection = MoveDirection.Back;
+
+            if(!TimerMode && !isFalling && !steppedEmpty && isAlive){
+                movePlayer();
+            }
+        }
     }
 
     public void resetPlayer(){
-        //TODO: RESET POSITION
+        _GameManager.playerCamTOP.Priority = 7;
+
+        transform.localPosition = new Vector3(spawnPoint.x, spawnPoint.y, -0.7f);
+        gridX = spawnPoint.x;
+        gridY = spawnPoint.y;
+
+        moveDirection = MoveDirection.Forward;
+        nextMoveDirection = MoveDirection.Forward;
+
         playerMaterial.SetColor("Color_C63B14FB", startEmissionColor);
         playerMaterial.SetColor("Color_871271A7", materialColor);
 
         transform.rotation = Quaternion.identity;
+
+        isAlive = true;
 
         _PlayerLightController.resetLight();
         TickManager.instance.tick.AddListener(movePlayer);
@@ -289,10 +343,11 @@ public class PlayerController : MonoBehaviour
         float totalRotation = 0;
 
         while(totalRotation < 90){
-            speed += 180 / (tickInterval * tickInterval * 4 / 9) * Time.deltaTime;
-
             transform.RotateAround(_rotatePoint, _rotateAxis, speed * Time.deltaTime * _dirCoeff);
             totalRotation += speed * Time.deltaTime;
+
+            speed += 180 / (tickInterval * tickInterval * 4 / 9) * Time.deltaTime;
+
             yield return new WaitForEndOfFrame();
         }
 
@@ -341,12 +396,15 @@ public class PlayerController : MonoBehaviour
             slotEffect.transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z - 0.1f);
             slotEffect.SetActive(true);
 
+            _GameManager._GridSystem.clearSlot(gridX, gridY, _gridObj);
+
             transform.localPosition = _FinalPos;
             transform.rotation = Quaternion.identity;
             _GameManager._ProgressManager.increaseSlotScore();
             _GameManager._CameraManager.startFollowing(transform);
         }
         else if(_type == gridType.endfloor){
+            TickManager.instance.tick.RemoveListener(movePlayer);
             _GameManager._TickManager.SetIsGameStarted(false);
             _GameManager.endGame();
         }
@@ -356,6 +414,11 @@ public class PlayerController : MonoBehaviour
             GetComponent<Rigidbody>().AddForce(new Vector3(0,0,500));
 
             _GameManager.playerCamTOP.Priority = 12;
+        }
+
+        if(!TimerMode){
+            isSwiped = false;
+            resetTurn = false;
         }
 
         yield return new WaitForEndOfFrame();
@@ -377,7 +440,6 @@ public class PlayerController : MonoBehaviour
             else if(other.CompareTag("Projectile") && !isFalling && !resetTurn){
                 StopAllCoroutines();
                 loseCondition();
-                //Debug.Log("LOSE");
             }
             else if(other.CompareTag("TrapDoor") && !isFalling && !resetTurn){
                 isFalling = true;

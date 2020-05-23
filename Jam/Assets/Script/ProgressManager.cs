@@ -38,8 +38,14 @@ public class ProgressManager : MonoBehaviour
         return isObjectiveCompleted;
     }
 
+    public void resetProgress(){
+        enteredSlotCount = 0;
+        slotGoal = 0;
+    }
+
     private void checkProgress(){
         if(slotGoal == enteredSlotCount){
+            _UIManager.portalImage.SetActive(true);
             endPortalGFX.SetActive(true);
             isObjectiveCompleted = true;
         }

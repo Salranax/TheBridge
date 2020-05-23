@@ -21,7 +21,7 @@ public class GameManager : MonoBehaviour
     public CinemachineVirtualCamera playerCamTOP;
     private string LevelPrefName = "LevelProgress";
     private string UnlockPrefNsame = "LastUnlocked";
-    private string LastLevel = "1.5";
+    private string LastLevel = "1.9";
     int[] lastlvl;
 
     // Start is called before the first frame update
@@ -116,15 +116,21 @@ public class GameManager : MonoBehaviour
     }
 
     public void loadNextLevel(){
+        //TODO: Remove enemy on reload
         _PlayerController.resetPlayer();
         _GridSystem.resetGrid();
+        _ProgressManager.resetProgress();
+        _UIManager.resetGameUI();
         increaseLevel();
         startLevel();
     }
 
     public void reloadLevel(){
+        //TODO: Remove enemy on reload
         _PlayerController.resetPlayer();
         _GridSystem.resetGrid();
+        _ProgressManager.resetProgress();
+        _UIManager.resetGameUI();
         startLevel();
     }
 

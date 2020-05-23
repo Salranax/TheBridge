@@ -11,6 +11,7 @@ public class GridSystem : MonoBehaviour
 
     public gridType[,] grid;
     public GameObject[,] cubeGrid;
+    public List<GameObject> enemies = new List<GameObject>();
 
     //Generation System
     public GameObject endingEffect;
@@ -18,7 +19,6 @@ public class GridSystem : MonoBehaviour
 
     void Awake()
     {
-        
         if (instance == null)
         {
             instance = this;
@@ -36,6 +36,10 @@ public class GridSystem : MonoBehaviour
 
     public void addToCubegrid(GameObject _cube, int _x, int _y){
         cubeGrid[_x, _y] = _cube;
+    }
+
+    public void addEnemy(GameObject _enemy){
+        enemies.Add(_enemy);
     }
 
     public GameObject getGridGameobject(int x, int y){
@@ -106,6 +110,17 @@ public class GridSystem : MonoBehaviour
             }
         }
 
+        foreach (GameObject item in enemies)
+        {
+            Destroy(item);
+        }
+        
+        enemies.Clear();
+    }
+
+    public void clearSlot(int x, int y, GameObject _obj){
+        cubeGrid[x, y] = _obj;
+        grid[x,y] = gridType.floor;
     }
 }
 
