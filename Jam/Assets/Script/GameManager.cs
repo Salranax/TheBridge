@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
     public TextureLevelGenerator _TextureLevelGenerator;
     public CameraManager _CameraManager;
     public ProgressManager _ProgressManager;
+    public TutorialController _TutorialController;
     [Header("----------------------")]
     public CinemachineVirtualCamera startCam;
     public CinemachineVirtualCamera playerCam;
@@ -55,6 +56,10 @@ public class GameManager : MonoBehaviour
         _UIManager.activateGameUI();
 
         StartCoroutine(startCoroutine());
+
+        if(lvl[0] == 1 && lvl[1] == 1){
+            _TutorialController.levelOneTutorial();
+        }
     }
 
     public void endGame(){

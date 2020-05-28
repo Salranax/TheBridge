@@ -343,14 +343,17 @@ public class PlayerController : MonoBehaviour
         float totalRotation = 0;
 
         while(totalRotation < 90){
-            transform.RotateAround(_rotatePoint, _rotateAxis, speed * Time.deltaTime * _dirCoeff);
             totalRotation += speed * Time.deltaTime;
-
+            if(totalRotation > 90){
+                break;
+            }
+            transform.RotateAround(_rotatePoint, _rotateAxis, speed * Time.deltaTime * _dirCoeff);
+            
             speed += 180 / (tickInterval * tickInterval * 4 / 9) * Time.deltaTime;
 
             yield return new WaitForEndOfFrame();
         }
-
+        
         transform.rotation = startOrientation * Quaternion.AngleAxis(90, axis);
         transform.localPosition = finalPos;
 

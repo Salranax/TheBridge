@@ -23,6 +23,7 @@ ScriptsOnlyBuild:
     - TrapDoor
     - TriggerObject
     - TriggerObjectData
+    - TutorialController
     - UIActions
     - UIManager
     Cinemachine.dll:
@@ -136,6 +137,8 @@ ScriptsOnlyBuild:
       Script: {instanceID: 0}
     - Class: 108
       Script: {instanceID: 0}
+    - Class: 111
+      Script: {instanceID: 0}
     - Class: 114
       Script: {instanceID: 11392}
     - Class: 114
@@ -183,101 +186,103 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 12940}
     - Class: 114
-      Script: {instanceID: 12972}
+      Script: {instanceID: 12960}
     - Class: 114
-      Script: {instanceID: 13156}
+      Script: {instanceID: 12974}
     - Class: 114
-      Script: {instanceID: 13240}
+      Script: {instanceID: 13158}
     - Class: 114
-      Script: {instanceID: 13290}
+      Script: {instanceID: 13242}
     - Class: 114
-      Script: {instanceID: 13360}
+      Script: {instanceID: 13292}
     - Class: 114
-      Script: {instanceID: 13442}
+      Script: {instanceID: 13362}
     - Class: 114
-      Script: {instanceID: 13492}
+      Script: {instanceID: 13444}
     - Class: 114
-      Script: {instanceID: 13646}
+      Script: {instanceID: 13494}
     - Class: 114
-      Script: {instanceID: 13728}
+      Script: {instanceID: 13648}
     - Class: 114
-      Script: {instanceID: 13848}
+      Script: {instanceID: 13730}
     - Class: 114
-      Script: {instanceID: 13878}
+      Script: {instanceID: 13850}
     - Class: 114
-      Script: {instanceID: 14044}
+      Script: {instanceID: 13880}
     - Class: 114
-      Script: {instanceID: 14072}
+      Script: {instanceID: 14046}
     - Class: 114
-      Script: {instanceID: 14154}
+      Script: {instanceID: 14074}
     - Class: 114
-      Script: {instanceID: 14168}
+      Script: {instanceID: 14156}
     - Class: 114
-      Script: {instanceID: 14234}
+      Script: {instanceID: 14170}
     - Class: 114
-      Script: {instanceID: 14306}
+      Script: {instanceID: 14236}
     - Class: 114
-      Script: {instanceID: 14330}
+      Script: {instanceID: 14308}
     - Class: 114
-      Script: {instanceID: 14448}
+      Script: {instanceID: 14332}
     - Class: 114
-      Script: {instanceID: 14490}
+      Script: {instanceID: 14450}
     - Class: 114
-      Script: {instanceID: 14524}
+      Script: {instanceID: 14492}
     - Class: 114
-      Script: {instanceID: 14532}
+      Script: {instanceID: 14526}
     - Class: 114
-      Script: {instanceID: 14562}
+      Script: {instanceID: 14534}
     - Class: 114
-      Script: {instanceID: 14600}
+      Script: {instanceID: 14564}
     - Class: 114
-      Script: {instanceID: 14674}
+      Script: {instanceID: 14602}
     - Class: 114
-      Script: {instanceID: 14774}
+      Script: {instanceID: 14676}
     - Class: 114
-      Script: {instanceID: 14854}
+      Script: {instanceID: 14776}
     - Class: 114
-      Script: {instanceID: 14926}
+      Script: {instanceID: 14856}
     - Class: 114
-      Script: {instanceID: 14942}
+      Script: {instanceID: 14928}
     - Class: 114
-      Script: {instanceID: 15004}
+      Script: {instanceID: 14944}
     - Class: 114
-      Script: {instanceID: 15018}
+      Script: {instanceID: 15006}
     - Class: 114
-      Script: {instanceID: 15028}
+      Script: {instanceID: 15020}
     - Class: 114
-      Script: {instanceID: 15290}
+      Script: {instanceID: 15030}
     - Class: 114
-      Script: {instanceID: 15492}
+      Script: {instanceID: 15292}
     - Class: 114
-      Script: {instanceID: 15496}
+      Script: {instanceID: 15494}
     - Class: 114
-      Script: {instanceID: 15550}
+      Script: {instanceID: 15498}
     - Class: 114
-      Script: {instanceID: 15588}
+      Script: {instanceID: 15552}
     - Class: 114
-      Script: {instanceID: 15610}
+      Script: {instanceID: 15590}
     - Class: 114
-      Script: {instanceID: 15774}
+      Script: {instanceID: 15612}
     - Class: 114
-      Script: {instanceID: 15778}
+      Script: {instanceID: 15776}
     - Class: 114
-      Script: {instanceID: 15800}
+      Script: {instanceID: 15780}
     - Class: 114
       Script: {instanceID: 15802}
     - Class: 114
-      Script: {instanceID: 15840}
+      Script: {instanceID: 15804}
     - Class: 114
-      Script: {instanceID: 15870}
+      Script: {instanceID: 15842}
     - Class: 114
       Script: {instanceID: 15872}
     - Class: 114
-      Script: {instanceID: 16004}
+      Script: {instanceID: 15874}
     - Class: 114
-      Script: {instanceID: 16012}
+      Script: {instanceID: 16006}
     - Class: 114
-      Script: {instanceID: 16030}
+      Script: {instanceID: 16014}
+    - Class: 114
+      Script: {instanceID: 16032}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -849,6 +854,12 @@ ScriptsOnlyBuild:
     className: ControlTrack
   - hash:
       serializedVersion: 2
+      Hash: 678818c16038b1bc0e553fbf9572bdaa
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: TutorialController
+  - hash:
+      serializedVersion: 2
       Hash: 8dc90e648ac06f43bdd31ac9fa8f4579
     assemblyName: UnityEngine.UI.dll
     namespaceName: UnityEngine.UI
@@ -1155,7 +1166,7 @@ ScriptsOnlyBuild:
     className: CinemachineImpulseListener
   - hash:
       serializedVersion: 2
-      Hash: fec3093e8aadd8d7fc1202d7fbd1082c
+      Hash: 418f4d3a119668767552bc8cb0bad966
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: GameManager
@@ -1840,4 +1851,4 @@ ScriptsOnlyBuild:
   platform: 13
   scenePathNames:
   - Assets/Scenes/GameScene.unity
-  playerPath: C:/Users/AlperWork/Desktop/PrototypeV2.3.7(Tickless).apk
+  playerPath: C:/Users/AlperWork/Desktop/PrototypeV2.4.apk
